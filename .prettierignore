@@ -1,0 +1,8 @@
+node_modules
+dist
+package-lock.json
+API.md
+DATABASE.md
+UI.md
+Classroom_Survey_Web_App_Specification.md
+ASSIGNMENT.md
