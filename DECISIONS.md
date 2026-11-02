@@ -25,3 +25,9 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - Browser tokens are mandatory UUIDs. `answers.survey_id` and composite foreign keys enforce survey and choice relationships independently of RPC validation; free-text answers stay null for MVP.
 - The singleton instructor mutation lock serializes activation and edits. Shared survey-row locks allow parallel students and conflict with closing/deleting. A submission that locks first may finish before closure commits; after closure wins, new submissions reject. Hosted concurrency and performance still require measurement.
 - Private helpers have no client execute grants. Public security-definer RPCs fix search_path to empty and qualify application objects; explicit grants restrict the callable surface.
+
+## Phase 4 boundaries
+
+- Add basic draft metadata forms with the dashboard so New/Edit/Duplicate have working destinations. Preserve existing questions/choices in position order through the current atomic save RPC. Full question controls remain Phase 5. Concurrent edits from multiple tabs are last-save-wins while still Draft; activated/historical content remains protected by the database.
+- No results/presentation links until those pages exist. Keep the corresponding checklist work open instead of introducing dead links. Empty drafts may be stored, but the database rejects activation until questions exist.
+- Read all ordered API pages for client-side title/status filtering, then paginate cards locally. A refresh reconciles changes made in another tab. Use native modal dialogs with initial Cancel focus, Escape/cancel and focus restoration; block cancellation while a mutation is in flight. Refuse deletion if response-count lookup fails.

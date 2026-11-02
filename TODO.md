@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-02
 
-The starting workspace contained only five specification files, without application code or Git history. All inherited completion checks were reset. Phase 1 and the initial GitHub push are complete. Phase 2 database code is implemented and locally tested; hosted Supabase creation/application/verification remain pending. Authentication, application workflows and deployment are pending. ASSIGNMENT.md was subsequently supplied and reviewed; its requirements and rubric are mapped in VERIFICATION.md.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–3 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout are user-confirmed. Phase 4 dashboard and basic draft details are implemented locally; question editing, presentation, student submissions, results and deployment remain pending. Exact migration records, broader hosted checks and full workflow verification remain open.
 
 ## Purpose
 
@@ -83,28 +83,34 @@ Implementation checks below are component-tested using SDK fixtures. Real instru
 
 # Phase 4 — Instructor Dashboard
 
-- [ ] Create the dashboard layout.
-- [ ] Load surveys from Supabase.
-- [ ] Display survey title, status, and creation date.
-- [ ] Add status badges for Draft, Active, Closed, and Archived.
-- [ ] Add a New Survey button.
-- [ ] Add Edit action.
-- [ ] Add Duplicate action.
-- [ ] Add Delete action.
-- [ ] Add Archive action.
-- [ ] Add View Results action.
-- [ ] Add Activate action.
-- [ ] Add Close action.
-- [ ] Add search by survey title.
-- [ ] Add filtering by status.
+Implementation is verified with component/service fixtures and existing database tests; actual-account dashboard workflow and native-dialog/mobile verification remain pending. New/Edit currently manage title/description; full question editing is Phase 5.
+
+- [x] Create the dashboard layout.
+- [x] Load surveys from Supabase with ordered API pagination.
+- [x] Display survey title, status, and creation date.
+- [x] Add status badges for Draft, Active, Closed, and Archived.
+- [x] Add a New Survey button and basic draft-details form.
+- [x] Add Edit action for draft details only, preserving question content.
+- [x] Add Duplicate action and redirect to the new draft.
+- [x] Add Delete action with response-count warning and confirmation.
+- [x] Add Archive action with confirmation.
+- [ ] Add View Results action (deferred until results page in Phase 9).
+- [x] Add Activate action with confirmation and friendly validation errors.
+- [x] Add Close action with confirmation.
+- [x] Add search by survey title.
+- [x] Add filtering by status.
+- [x] Add refresh, loading/error/empty states and UI pagination.
+- [x] Verify actual-account draft creation and persistence after refresh (user-confirmed).
+- [ ] Verify actual-account edit/duplicate/archive/delete.
+- [ ] Verify native dialog keyboard/focus behavior and narrow/mobile layouts.
 
 ---
 
 # Phase 5 — Survey Editor
 
-- [ ] Create a survey editor page.
-- [ ] Add survey title field.
-- [ ] Add optional description field.
+- [x] Create a basic draft-details page (full question editor pending).
+- [x] Add survey title field.
+- [x] Add optional description field.
 - [ ] Add questions dynamically.
 - [ ] Support Multiple Choice questions.
 - [ ] Support True / False questions.
@@ -114,9 +120,9 @@ Implementation checks below are component-tested using SDK fixtures. Real instru
 - [ ] Delete questions.
 - [ ] Delete choices.
 - [ ] Validate required fields.
-- [ ] Save a survey as Draft.
-- [ ] Load an existing survey for editing.
-- [ ] Prevent editing an active survey unless it is first closed.
+- [x] Save basic survey details as Draft (question editing pending).
+- [x] Load an existing draft for detail editing, preserving ordered questions/choices.
+- [x] Enforce draft-only editing; Active/Closed/Archived content requires duplication, preserving historical answers.
 
 ---
 

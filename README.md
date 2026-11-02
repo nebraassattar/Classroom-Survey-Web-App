@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. Phase 2 provides versioned SQL migrations, RLS and guarded RPCs. Phase 3 adds real Supabase instructor login, allowlist authorization, session handling and a protected dashboard shell. Survey management and deployment remain pending. No mock data is used in the application; automated tests use clearly isolated fixtures.
+Individual CSE 4095 project. Phase 2 provides versioned SQL migrations, RLS and guarded RPCs. Phase 3 adds real Supabase instructor login and protected pages. Phase 4 adds the survey dashboard, search/filtering, lifecycle actions and basic draft details. Question editing, presentation, student forms, results/CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
 
 ## Local setup
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. The home page links to Instructor Login. Use your privately provisioned instructor credentials there, never in chat. An authorized account reaches `/dashboard`; survey management is reserved for Phase 4.
+Open the local URL printed by Vite. The home page links to Instructor Login. Use your privately provisioned instructor credentials there, never in chat. An authorized account reaches `/dashboard` and loads surveys from Supabase.
 
 ```sh
 npm run lint
@@ -29,7 +29,7 @@ For Phase 2, follow [Supabase setup and RPC contracts](supabase/README.md). Crea
 
 ## Configuration and security
 
-In the database phase, copy `.env.example` to `.env.local` and fill values locally from your Supabase project. Never paste secrets into chat. Vite exposes all `VITE_` values publicly: use only the project URL and publishable key, never a secret/service-role key or database password. The current client factory is not invoked by any page.
+Copy `.env.example` to `.env.local` and fill values locally from your Supabase project. Never paste secrets into chat. Vite exposes all `VITE_` values publicly: use only the project URL and publishable key, never a secret/service-role key or database password. Auth and survey pages use the shared client.
 
 Authentication requires both a valid Supabase session and a successful `is_instructor()` RPC. Public signup is disabled; signing in alone grants no instructor privileges. Membership checks fail closed on errors, and the database independently enforces access. The SDK persists/refreshes sessions locally; logout clears the current browser session (not every device). Keep the browser profile private on shared computers.
 
@@ -37,7 +37,17 @@ Authentication requires both a valid Supabase session and a successful `is_instr
 
 Run `npm test` for component-level Auth tests using SDK fixtures, and `npm run check:supabase` for read-only hosted checks using `.env.local` (no instructor password). The latter verifies public RPC connectivity, anonymous response/answer/result denial, and disabled signup; it does not test a real instructor login.
 
-To finish manual verification: open `/dashboard` signed out and confirm redirection to `/login`; sign in with your real instructor account; check your email on the dashboard; refresh to verify persistence; log out and retry the protected URL. Check invalid credentials, keyboard controls and narrow mobile layouts. Test a separately provisioned non-allowlisted account privately to confirm denial. Never enable public signup to create test users. Actual-account login, refresh, logout, two-browser and mobile checks are pending until observed/reported.
+Real instructor login, refresh persistence, logout and signed-out redirect are user-confirmed. Still check invalid credentials, keyboard controls and narrow mobile layouts. Test a separately provisioned non-allowlisted account privately to confirm denial. Never enable public signup to create test users. Two-browser, mobile and real non-instructor checks remain pending.
+
+## Phase 4 verification and boundary
+
+Sign in, choose **New survey**, enter title/description and save. Refresh to confirm the database-backed Draft persists. Search by title and filter by status. Edit draft details, duplicate a survey and confirm the copied draft opens. Test archive confirmation/cancellation and refresh persistence. Delete only disposable test drafts after reading the warning; existing responses receive a stronger warning, and archive is recommended. The UI refuses deletion if its response-count check fails.
+
+Activation asks for confirmation and closes the prior Active survey through the existing RPC. A new empty draft correctly reports that questions are required; add-question editing arrives in Phase 5. Existing question/choice content is preserved and sorted on metadata saves. Active surveys expose Close, while Closed/Archived surveys require duplication to edit or reuse. No new migration is needed in this phase.
+
+The dashboard fetches ordered API pages of 500 rows, searches/filters the loaded set and displays 12 cards per UI page. This assumes the project's default API row cap is at least 500; reducing it requires adjusting the page size. Concurrent changes during multi-page fetches may require Refresh to reconcile. Results/presentation navigation is deferred until the corresponding pages exist, rather than linking to unfinished routes. Basic metadata forms deliberately precede the full question editor.
+
+Run `npm test` for dashboard/service/Auth fixture tests and `npm run test:db` for real embedded PostgreSQL validation. New dashboard mutations have not been independently exercised through a real instructor session; perform the manual checks above. Mobile/native-dialog focus and full end-to-end verification remain pending.
 
 ## Architecture and roadmap
 
@@ -45,8 +55,8 @@ React renders routed pages; Tailwind supplies styles; the Supabase client connec
 
 1. Project setup (complete).
 2. Versioned migrations, RLS, instructor allowlist, submission/activation RPCs and database security tests (implemented locally; hosted setup pending).
-3. Instructor authentication and protected routes (implemented and component-tested; actual-account verification pending).
-4. Dashboard, draft editor, duplication and lifecycle controls.
+3. Instructor authentication and protected routes (implemented, component-tested; actual-account login/refresh/logout user-confirmed).
+4. Dashboard, basic draft details, duplication and lifecycle controls (implemented; actual-account workflow verification pending). Full question editor follows.
 5. Activation and presentation with public URLs and downloadable QR PNG.
 6. Anonymous student forms and duplicate protection.
 7. Results, history and CSV.

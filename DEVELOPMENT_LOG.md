@@ -65,3 +65,17 @@ Validation outcomes will be appended after checks finish. Browser, database, end
 - User reported 'It works!' after instructions to run the app and sign in with the real Supabase instructor account. Recorded as user-reported successful local application/login verification. Refresh persistence, logout, real non-instructor denial, mobile and two-browser behavior were not specifically confirmed.
 
 - User confirmed real-account dashboard refresh persistence, logout and signed-out protected-route redirection work as expected. User requested committing/pushing Phase 3 and proceeding to the dashboard phase.
+
+## 2026-11-02 — Phase 3 push and Phase 4 dashboard
+
+- Committed and pushed Phase 3 as 3947b62 (`feat: add instructor authentication and protected routes`) before starting Phase 4, as requested. Private environment values remain ignored.
+- Added Supabase-backed survey list, title search, combined status filter, labels/dates, refresh/loading/error/empty states, ordered API pagination and 12-card UI pagination. No demo data is included in the application.
+- Added basic New/Edit draft title/description forms and Duplicate redirect. Metadata saves preserve ordered nested question/choice text through the existing atomic draft RPC; full question editing remains Phase 5. Active/Closed/Archived editing is withheld and still rejected by the backend.
+- Added activation/close/archive/delete RPC actions with native confirmations. Activation warns about closing the prior active survey. Delete checks response count, warns strongly about historical data and encourages Archive; count-check failure prevents deletion. Results/presentation navigation remains pending until real pages are implemented.
+- Added dashboard/service tests for filtering, pagination, load retry, metadata save, preserving nested content/order, duplication destination, historical edit blocking, cancellation, response-deletion warnings and activation validation. Test-only native-dialog fixture models open/close; actual native focus trapping/mobile behavior is not established by these fixtures.
+- First dashboard test run passed 23 component tests; lint identified a dialog ref cleanup warning. Captured the actual dialog element in the effect cleanup, fixing the warning. Added five service tests; all 28 component/service/Auth tests then passed, along with 77 embedded PostgreSQL assertions, lint, TypeScript and production build.
+- Production build: 96 modules; JavaScript 504.82 kB / 147.84 kB gzip. Vite reports the chunk exceeds 500 kB; page-load target remains unmeasured and route splitting/performance work remains for verification. No hosted instructor data was created/deleted by the agent in this phase. Actual-account dashboard workflow, mobile/native-dialog and full end-to-end checks remain pending.
+- Consulted official ordered range-query guidance: https://supabase.com/docs/reference/javascript/using-modifiers-range . No database migrations changed.
+
+- User confirmed the created draft remains after refresh. Recorded actual-account creation/persistence as user-reported; edit, duplicate, archive and deletion behavior were not explicitly confirmed.
+- User requested committing/pushing Phase 4 now and waiting for explicit instruction before starting the next phase. Preparing the reviewed dashboard, basic draft forms, tests and documentation for that push; no Phase 5 question controls started.

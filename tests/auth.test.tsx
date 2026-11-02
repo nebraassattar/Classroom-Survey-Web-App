@@ -8,6 +8,11 @@ import { ProtectedRoute } from '../src/auth/ProtectedRoute'
 import { LoginPage } from '../src/pages/LoginPage'
 import { DashboardPage } from '../src/pages/DashboardPage'
 
+vi.mock('../src/lib/surveys', () => ({
+  surveyApi: { list: vi.fn().mockResolvedValue([]) },
+  surveyError: () => 'Unable to load surveys.',
+}))
+
 const instructor = {
   access_token: 'fixture-token',
   user: { id: 'fixture-user', email: 'teacher@example.test' },

@@ -7,6 +7,7 @@ import { AuthProvider } from './auth/AuthProvider'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { SurveyDraftPage } from './pages/SurveyDraftPage'
 import './styles.css'
 
 createRoot(document.getElementById('root')!).render(
@@ -18,6 +19,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/surveys/new" element={<SurveyDraftPage />} />
+            <Route path="/surveys/:id/edit" element={<SurveyDraftPage />} />
           </Route>
           <Route path="*" element={<SetupPage notFound />} />
         </Routes>
