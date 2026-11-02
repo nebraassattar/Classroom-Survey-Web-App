@@ -52,9 +52,9 @@ Database definitions and role behavior below are verified in embedded PostgreSQL
 - [x] Add rollback-only hosted smoke script and verify it executes locally.
 - [ ] Apply both migrations to hosted Supabase and record application dates.
 - [x] Disable public signup and provision instructor Auth user plus allowlist entry (user-confirmed).
-- [x] Configure browser-safe local environment values (filled and Git-ignored; connectivity not yet tested).
+- [x] Configure browser-safe local environment values (filled and Git-ignored; read-only hosted connectivity verified).
 - [ ] Run the hosted database smoke script and inspect tables/relationships/RLS.
-- Hosted progress: user reports instructor allowlist provisioning and whole-script smoke execution without errors. Exact migration dates and schema inspection evidence remain unconfirmed. Public signup is user-confirmed disabled. `.env.local` settings are now filled and Git-ignored; connectivity remains untested.
+- Hosted progress: user reports instructor allowlist provisioning and whole-script smoke execution without errors. Exact migration dates and schema inspection evidence remain unconfirmed. Public signup is user-confirmed disabled. `.env.local` settings are now filled and Git-ignored; read-only hosted connectivity is verified.
 - [ ] Verify actual hosted Auth/Data API access with instructor, non-instructor and anon clients (requires Auth integration).
 - [ ] Verify concurrent activation, duplicate submissions and close-versus-submit on multi-session PostgreSQL.
 
@@ -62,13 +62,22 @@ Database definitions and role behavior below are verified in embedded PostgreSQL
 
 # Phase 3 — Instructor Authentication
 
-- [ ] Create the instructor login page.
-- [ ] Connect login to Supabase Auth.
-- [ ] Add logout.
-- [ ] Create an authentication context/provider.
-- [ ] Create a protected-route component.
-- [ ] Redirect unauthenticated users to login.
-- [ ] Show the logged-in instructor in the dashboard.
+Implementation checks below are component-tested using SDK fixtures. Real instructor-account login, refresh and logout are user-confirmed; non-instructor, mobile and multi-browser verification remain pending. No password is collected in chat.
+
+- [x] Create the instructor login page.
+- [x] Connect login to Supabase Auth.
+- [x] Add logout (current browser session).
+- [x] Create an authentication context/provider.
+- [x] Create a protected-route component with server-side allowlist RPC check.
+- [x] Redirect unauthenticated users to login.
+- [x] Show the logged-in instructor in the dashboard shell.
+- [x] Handle failed authorization, non-instructor accounts and stale asynchronous results without exposing protected content.
+- [x] Verify hosted public RPC connectivity and anonymous data restrictions through read-only API checks.
+- [x] Independently verify hosted Auth reports public signup disabled after correcting the setting.
+- [x] Manually verify real instructor login (user-reported successful local app/login check).
+- [x] Manually verify persistence after refresh and logout (user-confirmed).
+- [ ] Manually verify a real non-instructor account is denied.
+- [ ] Verify mobile layout, keyboard behavior and two browsers with real Auth.
 
 ---
 
@@ -218,7 +227,7 @@ Database definitions and role behavior below are verified in embedded PostgreSQL
 
 # Phase 14 — Testing
 
-- [ ] Test instructor login.
+- [x] Test instructor login (component-tested and user-confirmed with real account).
 - [ ] Test survey creation.
 - [ ] Test survey editing.
 - [ ] Test activation.

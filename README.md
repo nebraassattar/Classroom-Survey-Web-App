@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. The frontend remains a local React/TypeScript/Vite shell. Phase 2 adds versioned SQL migrations, RLS and guarded RPCs with embedded PostgreSQL tests. Hosted Supabase setup, frontend authentication/surveys and deployment remain pending. No mock survey data is used in the application; database tests use disposable fixtures.
+Individual CSE 4095 project. Phase 2 provides versioned SQL migrations, RLS and guarded RPCs. Phase 3 adds real Supabase instructor login, allowlist authorization, session handling and a protected dashboard shell. Survey management and deployment remain pending. No mock data is used in the application; automated tests use clearly isolated fixtures.
 
 ## Local setup
 
@@ -11,10 +11,11 @@ npm install
 npm run dev
 ```
 
-Open the local URL printed by Vite. Verify the home page, Instructor Login setup notice, and unknown-route message. No credentials are required for this phase.
+Open the local URL printed by Vite. The home page links to Instructor Login. Use your privately provisioned instructor credentials there, never in chat. An authorized account reaches `/dashboard`; survey management is reserved for Phase 4.
 
 ```sh
 npm run lint
+npm test
 npm run test:db
 npm run typecheck
 npm run format:check
@@ -30,7 +31,13 @@ For Phase 2, follow [Supabase setup and RPC contracts](supabase/README.md). Crea
 
 In the database phase, copy `.env.example` to `.env.local` and fill values locally from your Supabase project. Never paste secrets into chat. Vite exposes all `VITE_` values publicly: use only the project URL and publishable key, never a secret/service-role key or database password. The current client factory is not invoked by any page.
 
-Authentication will require both a valid Supabase session and a database-controlled instructor allowlist. Public signup will be disabled; signing in alone must never grant instructor privileges. Database RLS and validated RPCs are mandatory before data features are connected.
+Authentication requires both a valid Supabase session and a successful `is_instructor()` RPC. Public signup is disabled; signing in alone grants no instructor privileges. Membership checks fail closed on errors, and the database independently enforces access. The SDK persists/refreshes sessions locally; logout clears the current browser session (not every device). Keep the browser profile private on shared computers.
+
+## Phase 3 verification
+
+Run `npm test` for component-level Auth tests using SDK fixtures, and `npm run check:supabase` for read-only hosted checks using `.env.local` (no instructor password). The latter verifies public RPC connectivity, anonymous response/answer/result denial, and disabled signup; it does not test a real instructor login.
+
+To finish manual verification: open `/dashboard` signed out and confirm redirection to `/login`; sign in with your real instructor account; check your email on the dashboard; refresh to verify persistence; log out and retry the protected URL. Check invalid credentials, keyboard controls and narrow mobile layouts. Test a separately provisioned non-allowlisted account privately to confirm denial. Never enable public signup to create test users. Actual-account login, refresh, logout, two-browser and mobile checks are pending until observed/reported.
 
 ## Architecture and roadmap
 
@@ -38,7 +45,7 @@ React renders routed pages; Tailwind supplies styles; the Supabase client connec
 
 1. Project setup (complete).
 2. Versioned migrations, RLS, instructor allowlist, submission/activation RPCs and database security tests (implemented locally; hosted setup pending).
-3. Instructor authentication and protected routes.
+3. Instructor authentication and protected routes (implemented and component-tested; actual-account verification pending).
 4. Dashboard, draft editor, duplication and lifecycle controls.
 5. Activation and presentation with public URLs and downloadable QR PNG.
 6. Anonymous student forms and duplicate protection.

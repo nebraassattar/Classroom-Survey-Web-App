@@ -1,5 +1,17 @@
 @import 'tailwindcss';
 
+@layer components {
+  .button-primary {
+    @apply min-h-11 rounded-lg bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900 disabled:cursor-wait disabled:opacity-60;
+  }
+  .button-secondary {
+    @apply min-h-11 rounded-lg border border-slate-400 bg-white px-5 py-3 font-semibold hover:bg-slate-100 disabled:cursor-wait disabled:opacity-60;
+  }
+  .field {
+    @apply min-h-11 w-full rounded-lg border border-slate-400 bg-white px-3 py-3 disabled:opacity-60;
+  }
+}
+
 @layer base {
   body {
     margin: 0;

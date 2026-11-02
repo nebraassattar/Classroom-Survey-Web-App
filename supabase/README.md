@@ -1,6 +1,6 @@
 # Supabase setup and database contract
 
-Phase 2 includes executable migrations and embedded PostgreSQL tests. A hosted project has **not** been created or verified. Frontend authentication and connected pages are later phases.
+Phase 2 includes executable migrations and embedded PostgreSQL tests. The user reports hosted provisioning and smoke execution; read-only hosted API checks now independently confirm connectivity and anonymous response/result restrictions. Phase 3 connects real Auth and the instructor allowlist; actual-account verification remains pending.
 
 ## 1. Create a free project
 
@@ -33,7 +33,7 @@ This is administrative SQL, never browser code. No client can edit the allowlist
 
 Copy `.env.example` to `.env.local`. From Supabase project API/connection settings, copy the project URL and **publishable** key into `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Keep `VITE_PUBLIC_APP_URL=http://localhost:5173` locally. Restart Vite after changes. Never use a secret key, service-role key or database password: all `VITE_` values appear in browser code.
 
-Current setup pages intentionally make no Supabase requests. Configuring variables does not implement login; Phase 3 will connect Auth and check `is_instructor()`.
+The Phase 3 login page connects Supabase Auth and checks `is_instructor()` before allowing access to `/dashboard`. Authentication alone does not authorize an instructor. Survey management comes in Phase 4.
 
 ## 4. Inspect and verify
 
@@ -93,9 +93,10 @@ Instructor mutations acquire a singleton row lock first to serialize activation.
 
 - Project created: user-reported in supplied setup history on 2026-11-02.
 - Both migration versions applied: inferred from user-reported successful instructor provisioning and full smoke-script execution; no direct inspection or exact application timestamps available.
-- Instructor provisioned: user-reported successful allowlist insert. Public signup disabled: user-confirmed on 2026-11-02.
-- Browser-safe local variables: user saved values; all three expected fields are filled and the file is Git-ignored. Values were not printed. Hosted connectivity is not yet verified.
+- Instructor provisioned: user-reported successful allowlist insert. Read-only Auth settings initially reported signup enabled; after the user turned it off and saved, a repeat check independently confirmed `disable_signup: true` on 2026-11-02.
+- Browser-safe local variables: user saved values; all three expected fields are filled and the file is Git-ignored. Values were not printed. Read-only hosted connectivity now verified.
 - Hosted smoke: user reports executing the entire script with no error, displaying a blank `set_config` result. This is consistent with successful execution; PASS notice was not captured and the agent did not independently observe the hosted run.
-- Actual Auth/Data API, schema inspection evidence and concurrent-session verification: pending.
+- Read-only hosted API checks: public survey RPC reachable with unknown-slug response, anonymous response/answer reads denied and anonymous results RPC denied. `npm run check:supabase` passes all five checks.
+- Actual instructor/non-instructor Auth sessions, schema inspection evidence and concurrent-session verification: pending.
 
 Sources: [Database functions](https://supabase.com/docs/guides/database/functions), [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Auth configuration](https://supabase.com/docs/guides/auth/general-configuration).

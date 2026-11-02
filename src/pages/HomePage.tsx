@@ -21,8 +21,7 @@ export function HomePage() {
         Instructor Login
       </Link>
       <p className="mt-10 border-t border-slate-300 pt-5 text-sm text-slate-600">
-        Project setup preview. Authentication and survey features are not
-        implemented yet.
+        Students join through the survey URL or QR code shared in class.
       </p>
     </main>
   )

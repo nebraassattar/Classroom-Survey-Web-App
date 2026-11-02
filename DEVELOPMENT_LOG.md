@@ -49,3 +49,19 @@ Validation outcomes will be appended after checks finish. Browser, database, end
 - User confirmed saving .env.local. Checked only filled/placeholder status for the three expected settings and Git exclusion; all were filled and ignored. No values were displayed. This does not verify credential validity or hosted connectivity.
 
 - User explicitly confirmed public signup is off in Supabase. Updated the configuration checklist as user-confirmed; actual Auth/API and concurrent-session checks remain pending.
+
+## 2026-11-02 — Phase 2 push and Phase 3 authentication
+
+- User requested pushing all existing work before Phase 3. Committed/pushed Phase 2 as a6a4794 (`feat: add secure database foundation and PostgreSQL tests`). Environment values remained excluded.
+- Implemented real email/password Supabase login, a shared client, auth provider, initial getSession restoration, synchronous onAuthStateChange listener, separate instructor-membership RPC, local-browser logout and a protected dashboard shell displaying the account email. No signup route or mock Auth exists in the app.
+- Authorization fails closed while pending, denied or errored. Cancellation/snapshot checks prevent old session or membership responses from exposing protected content after sign-out. Network and initial-session checks have bounded waits; errors are friendly and credentials are never logged.
+- Added Vitest/Testing Library tests with SDK fixtures, distinct from real hosted checks. First run passed 11/12: the logout-error test clicked a logout button in the intermediate loading panel before the dashboard mounted, losing the component-local error when the view changed. Corrected the test to await the dashboard and removed the intermediate loading-panel logout button; second run passed all 12 before the final timeout changes. Final checks are recorded after execution.
+- Added a read-only hosted check script that prints status only. Public RPC connectivity and anonymous response/answer/results denial passed. Auth settings initially returned disable_signup=false despite the earlier user confirmation. Informed the user; they turned signup off and saved. Repeat read-only check passed all five checks, including disable_signup=true. No users or data were created by this probe.
+- Browser preview initially failed because the sandbox server was not reachable from the browser. Restarted Vite outside the sandbox; browser rendered the login form and visibly redirected signed-out /dashboard to /login. No real instructor password was entered. Actual-account login/refresh/logout, non-instructor login, mobile and multi-browser QA remain pending.
+- Consulted official Supabase Auth listener documentation: https://supabase.com/docs/reference/javascript/auth-onauthstatechange . Kept Supabase calls outside the listener callback. No Phase 4 survey management was implemented.
+
+- Final Phase 3 validation: all 12 Auth component tests and 77 embedded database assertions passed; ESLint, TypeScript (also run by production build), Prettier formatting and Git whitespace checks passed. Production build succeeded (93 modules; JavaScript 493.46 kB / 144.42 kB gzip). All five read-only hosted checks passed. These do not establish actual-account or performance results. Phase 3 changes remain local for review; Phase 2 is pushed.
+
+- User reported 'It works!' after instructions to run the app and sign in with the real Supabase instructor account. Recorded as user-reported successful local application/login verification. Refresh persistence, logout, real non-instructor denial, mobile and two-browser behavior were not specifically confirmed.
+
+- User confirmed real-account dashboard refresh persistence, logout and signed-out protected-route redirection work as expected. User requested committing/pushing Phase 3 and proceeding to the dashboard phase.
