@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. Phase 1 provides a local React/TypeScript/Vite shell; authentication, surveys, database migrations, and deployment are not implemented. No mock survey data is used.
+Individual CSE 4095 project. The frontend remains a local React/TypeScript/Vite shell. Phase 2 adds versioned SQL migrations, RLS and guarded RPCs with embedded PostgreSQL tests. Hosted Supabase setup, frontend authentication/surveys and deployment remain pending. No mock survey data is used in the application; database tests use disposable fixtures.
 
 ## Local setup
 
@@ -15,13 +15,16 @@ Open the local URL printed by Vite. Verify the home page, Instructor Login setup
 
 ```sh
 npm run lint
+npm run test:db
 npm run typecheck
 npm run format:check
 npm run build
 npm run preview
 ```
 
-After a lockfile is generated, use `npm ci` for reproducible installation. Run `npm run format` to format files.
+Use the committed lockfile with `npm ci` for reproducible installation. Run `npm run format` to format files.
+
+For Phase 2, follow [Supabase setup and RPC contracts](supabase/README.md). Create your project, apply the two migrations, disable signup, provision instructor membership, and configure browser-safe values locally. Hosted verification is pending; the automated database suite runs without credentials.
 
 ## Configuration and security
 
@@ -33,8 +36,8 @@ Authentication will require both a valid Supabase session and a database-control
 
 React renders routed pages; Tailwind supplies styles; the Supabase client connects to Auth and PostgreSQL. PostgreSQL owns authorization, constraints, activation transactions, and atomic submissions. Recharts and qrcode are declared for later phases.
 
-1. Project setup (current review boundary).
-2. Versioned migrations, RLS, instructor allowlist, submission/activation RPCs and database security tests.
+1. Project setup (complete).
+2. Versioned migrations, RLS, instructor allowlist, submission/activation RPCs and database security tests (implemented locally; hosted setup pending).
 3. Instructor authentication and protected routes.
 4. Dashboard, draft editor, duplication and lifecycle controls.
 5. Activation and presentation with public URLs and downloadable QR PNG.

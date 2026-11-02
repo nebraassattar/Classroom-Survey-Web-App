@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-02
 
-The starting workspace contained only five specification files, without application code or Git history. All inherited completion checks were reset. Only Phase 1 is complete; database, authentication, workflow, GitHub, and deployment tasks remain pending. ASSIGNMENT.md was subsequently supplied and reviewed; its requirements and rubric are mapped in VERIFICATION.md. This review does not mark any application features complete.
+The starting workspace contained only five specification files, without application code or Git history. All inherited completion checks were reset. Phase 1 and the initial GitHub push are complete. Phase 2 database code is implemented and locally tested; hosted Supabase creation/application/verification remain pending. Authentication, application workflows and deployment are pending. ASSIGNMENT.md was subsequently supplied and reviewed; its requirements and rubric are mapped in VERIFICATION.md.
 
 ## Purpose
 
@@ -28,21 +28,35 @@ This roadmap breaks the implementation into small, testable phases ordered from 
 
 # Phase 2 — Supabase Project and Database
 
-- [ ] Create a Supabase project.
-- [ ] Create the `surveys` table.
-- [ ] Create the `questions` table.
-- [ ] Create the `choices` table.
-- [ ] Create the `responses` table.
-- [ ] Create the `answers` table.
-- [ ] Add foreign-key constraints.
-- [ ] Add database indexes.
-- [ ] Add timestamps.
-- [ ] Add survey-status validation.
-- [ ] Create Row Level Security policies.
-- [ ] Verify students cannot read survey results.
-- [ ] Verify anonymous students can read active surveys.
-- [ ] Verify anonymous students can submit responses.
-- [ ] Verify authenticated instructors have full access.
+Database definitions and role behavior below are verified in embedded PostgreSQL, not hosted Supabase. Phase 2 remains open until the hosted checks are completed. See `supabase/README.md` for setup and contracts.
+
+- [x] Create a Supabase project (user-reported in supplied setup history).
+- [x] Define and locally create the `surveys` table through migrations.
+- [x] Define and locally create the `questions` table through migrations.
+- [x] Define and locally create the `choices` table through migrations.
+- [x] Define and locally create the `responses` table through migrations.
+- [x] Define and locally create the `answers` table through migrations.
+- [x] Add foreign-key constraints, including composite answer relationships.
+- [x] Add database indexes.
+- [x] Add timestamps and survey update trigger.
+- [x] Add survey-status validation and one-active unique index.
+- [x] Create Row Level Security policies and explicit grants.
+- [x] Verify students cannot read survey results in local database role tests.
+- [x] Verify anonymous students can read active surveys in local role tests.
+- [x] Verify anonymous students can submit complete responses atomically in local tests.
+- [x] Verify allowlisted instructors can read/manage data via authorized RPCs locally.
+- [x] Add admin-managed instructor allowlist; deny authenticated non-instructor permissions.
+- [x] Add activation, close, archive, deletion, duplication and atomic draft-save RPCs.
+- [x] Add submission validation, mandatory browser-token uniqueness and rollback tests.
+- [x] Add private result aggregation and minimal public survey RPCs.
+- [x] Add rollback-only hosted smoke script and verify it executes locally.
+- [ ] Apply both migrations to hosted Supabase and record application dates.
+- [x] Disable public signup and provision instructor Auth user plus allowlist entry (user-confirmed).
+- [x] Configure browser-safe local environment values (filled and Git-ignored; connectivity not yet tested).
+- [ ] Run the hosted database smoke script and inspect tables/relationships/RLS.
+- Hosted progress: user reports instructor allowlist provisioning and whole-script smoke execution without errors. Exact migration dates and schema inspection evidence remain unconfirmed. Public signup is user-confirmed disabled. `.env.local` settings are now filled and Git-ignored; connectivity remains untested.
+- [ ] Verify actual hosted Auth/Data API access with instructor, non-instructor and anon clients (requires Auth integration).
+- [ ] Verify concurrent activation, duplicate submissions and close-versus-submit on multi-session PostgreSQL.
 
 ---
 

@@ -8,6 +8,8 @@ Install dependencies, lint, typecheck, check formatting, build. Manually verify 
 
 ## Database gate
 
+Local command: `npm run test:db`. Actual migrations and rollback-only hosted smoke script execute against ephemeral embedded PostgreSQL. Auth roles/claims are fixtures; hosted Auth/API and concurrent sessions are separate pending gates. Follow `supabase/README.md` to apply migrations and run `supabase/tests/hosted-smoke.sql` in the real project. Do not interpret local test success as hosted verification.
+
 Apply versioned migrations to a disposable Supabase environment. Test anon, authenticated non-instructor and allowlisted instructor roles. Anon/non-instructors cannot mutate surveys, read responses/results or grant membership. Test direct REST writes as well as RPC access. Test active-only public reads, all foreign-key relationships, malformed/extra/missing/duplicate answers, wrong question/choice combinations, uniqueness, rollback on failure, concurrent activation, and close-versus-submit races. Assert exact stored response/answer counts.
 
 ## Full workflow

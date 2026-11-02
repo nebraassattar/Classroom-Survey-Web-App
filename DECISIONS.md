@@ -1,6 +1,6 @@
 # Decisions and specification reconciliation
 
-Recorded 2026-11-02. These guide later work; they are not implemented database guarantees yet.
+Recorded 2026-11-02. Phase 2 migrations implement the database decisions below and are tested in embedded PostgreSQL; hosted Supabase application and verification remain pending.
 
 - ASSIGNMENT.md was supplied and reviewed after setup on 2026-11-02. Its requirements and rubric are the acceptance criteria. No blocking conflict with the selected stack or plan was found. The assignment suggests a development order and permits alternative hosting/database services; retain the user-requested security-first order, Supabase and Cloudflare Pages. The one-week duration is stated, but no calendar due date is supplied.
 - Workspace inspection found only five Markdown specifications. Original TODO checks are unsupported and have been reset; only verified setup items may be restored.
@@ -15,3 +15,13 @@ Recorded 2026-11-02. These guide later work; they are not implemented database g
 - Use database aggregation for instructor results and browser CSV generation with escaping and spreadsheet formula protection. Realtime is outside MVP; provide refresh.
 - Production QR URLs derive from a validated public origin configured at build time, not a hardcoded localhost URL.
 - Keep the supplied phase numbering in TODO; implement duplication with survey management even though its checklist is later. No automatic next phase after setup review.
+
+## Phase 2 implementation choices
+
+- All instructor writes use authorized RPCs instead of direct client table mutations. This enforces draft-only content editing and lifecycle rules in the database. Instructor raw reads remain available under RLS for dashboard/history/CSV. Public read policies also apply to authenticated non-instructors so they may participate as students without receiving instructor rights.
+- Use `private.instructors` solely as an authorization allowlist, not a multiple-instructor management feature. No public signup or client self-enrollment. The administrator provisions UUID membership after creating the Auth user.
+- Whole-draft saves replace nested content atomically and derive contiguous positions from array order. Question/choice IDs may change during drafting; the editor must refetch on save. No submitted/activated content can enter this write path. Empty drafts are allowed to support preparation; activation requires questions with valid choices.
+- Closed/Archived content cannot be reopened or edited; duplicate it into a fresh Draft. This preserves a fixed historical response set and avoids reusing student tokens across separate classroom runs.
+- Browser tokens are mandatory UUIDs. `answers.survey_id` and composite foreign keys enforce survey and choice relationships independently of RPC validation; free-text answers stay null for MVP.
+- The singleton instructor mutation lock serializes activation and edits. Shared survey-row locks allow parallel students and conflict with closing/deleting. A submission that locks first may finish before closure commits; after closure wins, new submissions reject. Hosted concurrency and performance still require measurement.
+- Private helpers have no client execute grants. Public security-definer RPCs fix search_path to empty and qualify application objects; explicit grants restrict the callable surface.
