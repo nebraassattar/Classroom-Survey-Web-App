@@ -50,6 +50,16 @@ export function surveyError(error: unknown): string {
 }
 
 export const surveyApi = {
+  async summary(id: string) {
+    const { data, error } = await createSupabaseClient()
+      .from('surveys')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle()
+    if (error) throw error
+    if (!data) throw new Error('SURVEY_NOT_FOUND')
+    return data as Survey
+  },
   async list() {
     // Fetch all pages so search/filter never silently excludes older surveys.
     const surveys: Survey[] = []

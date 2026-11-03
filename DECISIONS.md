@@ -39,3 +39,11 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - The editor saves through the existing whole-draft RPC. Save and activate uses two existing RPCs; activation failure does not undo a successful draft save. Retain the saved ID for retry. Database lifecycle locking remains authoritative if another tab activates while editing.
 - Back-to-dashboard navigation confirms unsaved edits. Reload/tab-close uses native beforeunload warnings where supported; browser-history navigation is not comprehensively blocked. No autosave or multi-tab merge is claimed.
 - Lazy-load dashboard/editor routes with a loading fallback, addressing the observed bundle warning without claiming measured page-load performance. No SQL migrations or Auth settings changed.
+
+## Phase 6 presentation
+
+- Generate QR PNGs entirely in the browser with qrcode (1024px, four-module quiet zone, black/white, medium error correction). Use the identical data URL for display and download; filename uses the public slug.
+- Configure public URLs through VITE_PUBLIC_APP_URL. Require a public HTTPS origin for production, rejecting path/credential/query/fragment or local/private development origins. Development may follow the actual localhost port; explicit reachable LAN/public origins are retained. A localhost URL is not phone-accessible across devices.
+- Fetch only survey metadata and an instructor-authorized response count; no anonymous access to responses is added. Poll Active presentations without overlapping requests, scheduling the next check 10 seconds after completion. Unknown survey status hides QR; count errors show Unavailable rather than zero. Closed/Draft/Archived pages never present a shareable QR.
+- Local close hides QR immediately after success and blocks stale Active snapshots from restoring it. External closure is eventually reflected on the next successful poll; the database still rejects submissions after closure regardless of UI polling delay.
+- Keep Phase 7 student forms and results pages unimplemented and label their absence. A correct generated QR/URL does not prove the full student workflow. Real phone scanning and browser PNG behavior remain manual verification gates.

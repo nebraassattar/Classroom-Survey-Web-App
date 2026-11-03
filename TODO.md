@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-02
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–4 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout and draft creation/refresh are user-confirmed. Phase 5 question editing is implemented locally; presentation, student submissions, results and deployment remain pending. Exact migration records, broader hosted checks and full workflow verification remain open.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–5 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout, draft persistence and editor behavior are user-confirmed. Phase 6 presentation is implemented locally; student submissions, results and deployment remain pending. Exact migration records, broader hosted checks and full workflow verification remain open.
 
 ## Purpose
 
@@ -135,17 +135,26 @@ Implemented and component-tested; actual-account question save/reload, mobile an
 
 # Phase 6 — Survey Activation
 
-- [ ] Add activation logic.
-- [ ] Ensure at most one survey is Active.
-- [ ] Automatically close the previously active survey.
-- [ ] Generate a public survey slug or identifier.
-- [ ] Generate the public survey URL.
-- [ ] Generate a QR code from the public URL.
-- [ ] Create a Present Survey page.
-- [ ] Display survey title and QR code.
-- [ ] Display a readable fallback URL.
-- [ ] Add a Close Survey button.
-- [ ] Add a Download QR Code button.
+Implementation and QR decoding are automatically tested; actual-account/browser/phone/projector checks remain pending. Existing migration/RPC handles activation; no new migration. Student URL targets Phase 7, which is not yet implemented.
+
+- [x] Add activation logic (existing authorized RPC, dashboard/editor integration).
+- [x] Ensure at most one survey is Active through the database index and serialized RPC (multi-session verification still pending).
+- [x] Automatically close the previously active survey (database-tested).
+- [x] Generate a public survey slug or identifier in the database.
+- [x] Generate the public survey URL from validated configuration.
+- [x] Generate a QR code from the public URL.
+- [x] Create a protected Present Survey page and Active-card link.
+- [x] Display survey title and QR code.
+- [x] Display a readable fallback URL.
+- [x] Display instructor-only response count with refresh and unavailable/error handling.
+- [x] Detect closure/unknown status and hide stale QR sharing controls.
+- [x] Add a Close Survey button with confirmation.
+- [x] Add a Download QR PNG link using the displayed QR image.
+- [x] Decode a real generated PNG and assert the exact URL in automated tests.
+- [x] Verify real-account presentation behavior (user reports it works as expected).
+- [ ] Independently verify browser PNG download and actual phone/projector scan.
+- [ ] Verify cross-tab status/response-count updates with real data.
+- [ ] Verify production QR origin after deployment.
 
 ---
 

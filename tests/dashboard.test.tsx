@@ -168,6 +168,9 @@ describe('survey dashboard', () => {
     mount()
     const card = await screen.findByRole('article', { name: 'Functions' })
     expect(
+      within(card).getByRole('link', { name: 'Present QR' }),
+    ).toHaveAttribute('href', '/surveys/active-id/present')
+    expect(
       within(card).getByRole('button', { name: 'Close survey' }),
     ).toBeInTheDocument()
     expect(

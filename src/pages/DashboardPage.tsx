@@ -293,6 +293,14 @@ export function DashboardPage() {
                     </button>
                   )}
                   {survey.status === 'active' && (
+                    <Link
+                      className="button-secondary"
+                      to={`/surveys/${survey.id}/present`}
+                    >
+                      Present QR
+                    </Link>
+                  )}
+                  {survey.status === 'active' && (
                     <button
                       className="button-secondary"
                       disabled={blocked}
@@ -351,7 +359,7 @@ export function DashboardPage() {
         </section>
       )}
       <p className="mt-8 text-sm text-slate-600">
-        QR presentation and results pages are not available yet.
+        Student response forms and results pages are not available yet.
       </p>
       {confirmation && (
         <ConfirmDialog

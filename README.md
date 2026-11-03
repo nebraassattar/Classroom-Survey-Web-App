@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard and the full draft question editor with multiple-choice and True/False questions. Versioned migrations enforce RLS, authorization, lifecycle rules and atomic saves/submissions. QR presentation, student forms, results/CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
+Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, a full draft question editor and classroom QR presentation with PNG download. Versioned migrations enforce RLS, authorization, lifecycle rules and atomic saves/submissions. Student forms, results/CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
 
 ## Local setup
 
@@ -45,7 +45,7 @@ Sign in, choose **New survey**, enter title/description and save. Refresh to con
 
 Activation asks for confirmation and closes the prior Active survey through the existing RPC. A new empty draft correctly reports that questions are required. Active surveys expose Close, while Closed/Archived surveys require duplication to edit or reuse. No new migration is needed for the dashboard or question editor.
 
-The dashboard fetches ordered API pages of 500 rows, searches/filters the loaded set and displays 12 cards per UI page. This assumes the project's default API row cap is at least 500; reducing it requires adjusting the page size. Concurrent changes during multi-page fetches may require Refresh to reconcile. Results/presentation navigation is deferred until the corresponding pages exist, rather than linking to unfinished routes.
+The dashboard fetches ordered API pages of 500 rows, searches/filters the loaded set and displays 12 cards per UI page. This assumes the project's default API row cap is at least 500; reducing it requires adjusting the page size. Concurrent changes during multi-page fetches may require Refresh to reconcile. Active survey cards provide Present QR; results navigation remains deferred until that page exists.
 
 Draft creation and persistence after refresh are user-confirmed. Other dashboard mutations have not been independently exercised through a real instructor session; perform the manual checks above. Mobile/native-dialog focus and full end-to-end verification remain pending.
 
@@ -59,9 +59,21 @@ Open an existing Draft with **Edit**, or create a new survey. Add questions, sel
 
 Unsaved edits trigger confirmation on the Back to dashboard link, and a browser warning on reload/tab close when supported. Other browser-history transitions are not comprehensively blocked; save before navigating elsewhere. No autosave is implied.
 
-Manual verification: create one Multiple choice and one True/False question; reorder questions and choices after typing; cancel then confirm a deletion/type change; save; refresh/reopen and verify all text and ordering. Try blank fields to confirm validation. Duplicate a Closed/Archived survey to edit; direct historical edit URLs must stay blocked. Test Save and activate only on a disposable survey when no classroom collection is active, because it closes the previous Active survey. QR/student/results pages are still pending. Check on a phone and with keyboard navigation; real-account Phase 5 workflow is not yet confirmed.
+User reports the Phase 5 editor and save/reopen/refresh workflow work as expected after the suggested checks. Mobile/native-dialog verification remains pending. Test Save and activate only on a disposable survey when no classroom collection is active, because it closes the previous Active survey. Student/results pages remain pending.
 
 `npm test` covers editor/service/Auth behavior with fixtures; `npm run test:db` executes real PostgreSQL draft updates, ordering and rollback checks. Protected page bundles load on demand with a loading fallback; build sizes are measured, but the under-two-second page-load target remains unverified.
+
+## Phase 6 classroom presentation
+
+Activate a complete draft, then select **Present QR** on its Active dashboard card. The protected `/surveys/:id/present` page shows a projector-sized black/white QR image, title, readable `/s/:slug` URL, stored response count, Refresh presentation, Download QR PNG and confirmed Close survey.
+
+The QR is a 1024×1024 PNG with a four-module quiet zone and medium error correction. The displayed image and download use the same PNG and URL. Tests generate a real PNG and independently decode it back to the exact URL; this does not replace scanning it with an actual phone/projector setup. Node QR tests use the library's Node renderer; browser canvas/download behavior still needs manual verification.
+
+`VITE_PUBLIC_APP_URL` must be an origin without a path, credentials, query or fragment. Production requires a public HTTPS origin and refuses localhost/private development URLs. Set the deployed origin and rebuild at deployment. Development follows the current localhost port if Vite switches ports; an explicitly configured reachable LAN/public origin is preserved. A localhost QR cannot connect a phone to your computer. No external URL or deployment has been created by this phase.
+
+Survey status and response count refresh together, with the next poll scheduled 10 seconds after a successful Active-survey check; requests do not overlap. Refresh is also available manually. Closing elsewhere removes QR/download once detected. A status-fetch failure hides stale sharing information and asks for manual refresh; a count-only failure shows Unavailable, never a false zero. Closing here preserves history and prevents an older Active snapshot from restoring the QR. Counts use instructor-only queries, not a public response-count endpoint.
+
+Manual checks: open an Active survey presentation; verify its title/link; download/open the PNG; confirm a phone scanner recognizes the same URL; refresh; cancel then confirm Close and verify the QR disappears. Use a second instructor tab to activate a different survey and confirm the previous presentation detects closure. **The student response form is Phase 7: the QR target is correct, but `/s/:slug` does not render the survey yet.** Results navigation also remains pending. Actual-account presentation, browser PNG download, phone scan, projector readability and cross-tab status checks have not yet been reported.
 
 ## Architecture and roadmap
 
@@ -71,8 +83,8 @@ React renders routed pages; Tailwind supplies styles; the Supabase client connec
 2. Versioned migrations, RLS, instructor allowlist, submission/activation RPCs and database security tests (implemented locally; hosted setup pending).
 3. Instructor authentication and protected routes (implemented, component-tested; actual-account login/refresh/logout user-confirmed).
 4. Dashboard, duplication and lifecycle controls (implemented; create/refresh user-confirmed, other actual-account checks pending).
-5. Full question editor (implemented; actual-account workflow verification pending).
-6. Classroom presentation with public URLs and downloadable QR PNG.
+5. Full question editor (implemented; actual-account workflow user-confirmed).
+6. Classroom presentation with public URLs and downloadable QR PNG (implemented; actual-account/browser/phone verification pending).
 7. Anonymous student forms.
 8. Browser-token duplicate protection in the student UI (database constraint already implemented).
 9. Results dashboard.

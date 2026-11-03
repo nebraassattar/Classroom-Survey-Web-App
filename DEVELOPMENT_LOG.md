@@ -92,3 +92,17 @@ Validation outcomes will be appended after checks finish. Browser, database, end
 - Final Phase 5 checks passed: 43 component/service/Auth/model tests, 82 embedded PostgreSQL assertions, ESLint with zero warnings, TypeScript via production build, production build, Prettier formatting and Git whitespace checks. Phase 5 changes remain local and uncommitted for review; no real-account question-save test or performance success is claimed.
 
 - User subsequently reported testing the editor and confirmed that everything saves and works as expected, following the suggested question/reorder/save/reopen/refresh checks. Recorded Phase 5 real-account editor/persistence verification as user-reported. This does not establish mobile/native-dialog, concurrency, performance or the later student/QR/results workflow.
+
+## 2026-11-02 — Phase 5 push and Phase 6 presentation
+
+- User requested committing/pushing Phase 5 before Phase 6. Committed and pushed ea16a0e (`feat: add complete draft question editor`); environment values remained excluded.
+- Added protected presentation route, Active-card Present QR navigation, projector-sized QR/title/URL, instructor-only stored response count, manual refresh, PNG download and confirmed close. QR/download are hidden for inactive/unknown status; count failures show Unavailable. Periodic non-overlapping Active checks detect external closure, and local successful close cannot be undone by stale Active data.
+- Added validated URL generation: production requires a configured public HTTPS origin; development handles changing localhost ports and labels local reachability limitations. The QR target remains /s/:slug, with student forms clearly pending Phase 7. No new migration or hosted data mutation occurred.
+- Used qrcode for browser PNG generation. Added dev-only jsQR/pngjs decoding tests to independently verify a real 1024px PNG encodes the exact URL. Component QR image rendering is mocked only in tests, not in application code.
+- Initial run passed all component tests but Node QR suite failed during setup because HTMLDialogElement was unavailable outside JSDOM. Guarded the dialog fixture by environment; all 54 tests then passed, including real QR decode. Added a missing-slug case afterward; final results recorded below.
+- Production build succeeded: main JS 494.97 kB / 145.12 kB gzip, lazy presentation chunk 31.72 kB / 12.55 kB gzip. These are bundle measurements, not page-load or classroom scan results. Actual-account presentation, phone/projector, browser download and real cross-tab count/closure checks remain pending.
+- Consulted the qrcode project's primary API/options documentation: https://github.com/soldair/node-qrcode . No student/results UI or deployment is claimed.
+
+- Final Phase 6 validation passed: 55 app/QR tests, 82 embedded PostgreSQL assertions, ESLint with zero warnings, TypeScript, production build, Prettier and Git whitespace checks. Real PNG encoding/decoding is verified; actual instructor presentation, browser download, phone/projector scanning and cross-tab updates remain manual checks. Phase 6 changes remain local and uncommitted for review.
+
+- User subsequently reported checking Phase 6 and that it works as expected. Recorded presentation behavior as user-reported; the broad report does not independently establish each phone/projector, download or cross-tab check. User requested committing/pushing Phase 6 and starting the next phase.
