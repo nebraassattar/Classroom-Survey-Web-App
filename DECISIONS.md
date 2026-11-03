@@ -85,3 +85,7 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - Provide route titles, a skip link and heading focus after navigation. Wait for lazy content; avoid stealing focus after the user begins interacting. Focus terminal student outcomes so completion is announced through normal heading navigation.
 - Catch unexpected render/lazy-load failures with a recovery screen, preserving the same-browser guidance for uncertain submissions. Keep detailed internals out of the screen.
 - Use axe in component fixtures for semantic regressions. Disable color contrast only because JSDOM lacks layout; retain real browser/device, assistive-technology, load and concurrent-session checks as explicit gates.
+
+## Phase 15 hosting choice
+
+- The user created a Git-connected Cloudflare Worker while verifying their account. Use that existing service with static assets and an explicit SPA fallback rather than creating an additional Pages site. The frontend remains static; no Worker backend replaces Supabase. Pin Wrangler through the lockfile and Node through .node-version. Vite variables belong in build settings, not runtime bindings.
