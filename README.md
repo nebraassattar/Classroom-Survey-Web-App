@@ -3,7 +3,7 @@
 Individual CSE 4095 project built with React, TypeScript, Vite, Tailwind CSS, React Router, Supabase, Recharts and QRCode. Instructors manage surveys and view results; students answer active surveys anonymously through a public URL or QR code.
 
 - Source: https://github.com/nebraassattar/Classroom-Survey-Web-App
-- Public deployment: in progress; no public URL verified yet.
+- Public app: https://classroom-survey-web-app.nesattar786.workers.dev
 - [Deployment instructions](DEPLOYMENT.md)
 - [Submission package and evidence checklist](submission/README.md)
 
@@ -64,7 +64,7 @@ npm run check:supabase
 
 Recorded checkpoint on 2026-11-03: 116 app tests and 104 embedded database assertions passed; lint, TypeScript, build, formatting and whitespace checks passed. The production dependency audit reported zero known vulnerabilities. Hosted read-only checks confirmed public lookup, anonymous response/answer/results restrictions and disabled signup. Real signed-in Chrome results, matching downloaded CSV, QR presentation and canceled confirmation were checked. Public/dashboard/results layouts had no horizontal overflow at 320px. User-reported local feature/persistence checks are recorded separately from agent observations.
 
-Remaining checks include spreadsheet application import, physical phone/projector, another browser engine, screen-reader/contrast, production workflows, real concurrent database sessions and the 200-student/under-two-second targets. Chrome and the in-app browser are both Chromium. Axe tests cover semantics with color contrast disabled in JSDOM. Build sizes and passing tests do not prove performance targets. See [verification plan](VERIFICATION.md) and [detailed outcomes](DEVELOPMENT_LOG.md).
+Production checks passed for login, session refresh, sign-out protection, draft creation/reopen, anonymous submission and duplicate refresh, stored answers, results, CSV and public QR destination. A downloaded CSV also imported correctly in Excel with UTF-8/comma settings. Remaining checks include physical phone/projector, another browser engine, screen-reader/contrast, real concurrent database sessions and the 200-student/under-two-second targets. Chrome and the in-app browser are both Chromium. Axe tests cover semantics with color contrast disabled in JSDOM. Build sizes and passing tests do not prove performance targets. See [verification plan](VERIFICATION.md) and [detailed outcomes](DEVELOPMENT_LOG.md).
 
 ## Deploy and submit
 

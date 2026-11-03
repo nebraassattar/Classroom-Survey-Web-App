@@ -1,6 +1,6 @@
 # Classroom Survey Web App — development summary
 
-Draft for student review, 2026-11-03. Deployment is still pending. Replace the deployment paragraph with the verified outcome and personalize the final paragraph before submission. This report summarizes recorded work; it does not replace the required screenshots.
+Draft for student review, 2026-11-03. Deployment has been verified; personalize the final learning paragraph before submission. This report summarizes recorded work; it does not replace the required screenshots.
 
 ## Specifications and AI collaboration
 
@@ -24,6 +24,6 @@ One practical problem was that the initial Vite generator could not resolve the 
 
 ## Deployment and learning
 
-Deployment preparation uses Cloudflare Workers static assets, following the service created in the dashboard, using the GitHub `main` branch, `npm run build`, and the `dist` directory with explicit SPA fallback in `wrangler.json`. Node is pinned to the tested version. Production build variables must point to the existing Supabase project and the final public HTTPS origin, and Supabase Auth URL settings must match that origin. The public deployment URL, production workflow test and required evidence screenshots are still pending at the time of this draft.
+Deployment preparation uses Cloudflare Workers static assets, following the service created in the dashboard, using the GitHub `main` branch, `npm run build`, and the `dist` directory with explicit SPA fallback in `wrangler.json`. Node is pinned to the tested version. Production build variables must point to the existing Supabase project and the final public HTTPS origin, and Supabase Auth URL settings must match that origin. The public app is https://classroom-survey-web-app.nesattar786.workers.dev. The Git-integrated deployment succeeded. Production checks verified instructor login/refresh/logout, saved draft persistence, an anonymous response, duplicate refresh, stored answers and matching results/CSV. The deployed QR image decoded to the public origin. Four real database/application screenshots are included under submission/evidence; physical phone and performance checks are tracked separately.
 
-The project illustrates how frontend state differs from persistent database state, how primary/foreign keys preserve relationships, and why frontend route protection must be backed by database authorization. It also shows why AI-generated code needs tests and actual browser verification. Before submitting, I will describe in my own words which of these lessons I learned, confirm the final deployment outcome, and review the implementation so I can explain the complete submission-to-results data flow.
+The project illustrates how frontend state differs from persistent database state, how primary/foreign keys preserve relationships, and why frontend route protection must be backed by database authorization. It also shows why AI-generated code needs tests and actual browser verification. Before submitting, I will describe in my own words which of these lessons I learned, review the recorded deployment outcome and the implementation so I can explain the complete submission-to-results data flow.

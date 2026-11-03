@@ -42,3 +42,7 @@ Submission through HuskyCT must include the GitHub URL, deployed application URL
 ## 2026-11-03 verification checkpoint
 
 116 app tests and 104 embedded PostgreSQL assertions passed, along with lint, TypeScript, production build, formatting and whitespace checks. Real signed-in Chrome results/QR, CSV download and dialog cancellation passed; narrow dashboard/results/public layouts had no horizontal overflow. Chrome and the in-app browser are both Chromium, so cross-engine coverage remains pending. See DEVELOPMENT_LOG.md for exact scope, limitations and outstanding physical-device, spreadsheet, concurrency and performance checks. The current production dependency audit was blocked by registry DNS failure.
+
+## Production checkpoint — 2026-11-03
+
+Public deployment is verified at https://classroom-survey-web-app.nesattar786.workers.dev. Production login/session refresh/logout, draft creation/reopen with both question types, anonymous response/refresh protection, stored answers, results, CSV and QR URL decoding passed. Required real evidence is indexed in submission/evidence/README.md. The downloaded CSV imported successfully in Excel using UTF-8/comma settings. These observations supplement the automated checkpoint; they do not establish physical scanning, cross-engine, assistive-technology, real concurrent-session or performance coverage.

@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-03
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–10 (including the Phase 8 duplicate foundation) are committed/pushed. Real login, draft/editor/presentation, student and date-filter workflows are user-reported successful; detailed results/evidence checks remain pending. Combined 11–12 CSV/duplication is implemented/tested locally. Hosted export migration, browser/spreadsheet review, final polish/testing, deployment and evidence remain pending.
+Phases 1–14 are implemented and pushed, with verification limits recorded in DEVELOPMENT_LOG.md. Cloudflare Workers static-asset deployment is live and tested against hosted Supabase. Production Auth, draft persistence, anonymous submission/duplicate refresh, results, CSV and QR destination passed; required database/results screenshots and report/history drafts are included. Physical-device, private grader/report review, cross-engine/accessibility and concurrency/performance gates remain open. Phase 15 uses the Worker the user created instead of creating an additional Pages site.
 
 User-approved remaining batches: 11–12 CSV plus duplication verification; 13–14 polish plus full testing; 15 deployment plus submission. Phase 16 is excluded.
 
@@ -248,7 +248,7 @@ Implemented locally using a new instructor-only snapshot RPC. Apply only `202611
 - [x] Verify parser round-trip, export errors, permissions and token exclusion automatically.
 - [x] Hosted export RPC installation confirmed by successful instructor export on 2026-11-03.
 - [x] Verify real Chrome download and matching response values through instructor-only hosted RPC (2026-11-03).
-- [ ] Test export with spreadsheet applications.
+- [x] Import the downloaded CSV in Excel using UTF-8 and comma delimiters (default General converts True to TRUE).
 
 ---
 
@@ -284,7 +284,7 @@ Implemented and regression-tested. Browser checks cover narrow public/dashboard/
 
 # Phase 14 — Testing
 
-Checked items have automated coverage and/or recorded user reports; they do not imply every hosted/browser scenario passed. Current batch: 116 app tests and 104 embedded database assertions. Cross-engine, spreadsheet, physical-device, real concurrency and performance gates remain open in VERIFICATION.md.
+Checked items have automated coverage and/or recorded user reports; they do not imply every hosted/browser scenario passed. Current batch: 116 app tests and 104 embedded database assertions. Cross-engine, physical-device, assistive-technology, real concurrency and performance gates remain open in VERIFICATION.md.
 
 - [x] Test instructor login (component-tested and user-confirmed with real account).
 - [x] Test survey creation.
@@ -303,20 +303,26 @@ Checked items have automated coverage and/or recorded user reports; they do not 
 
 ---
 
-# Phase 15 — Deployment
+# Phase 15 — Deployment and Submission
 
 - [x] Push the project to GitHub.
-- [ ] Create the Cloudflare Pages site.
-- [ ] Connect Cloudflare Pages to the GitHub repository.
-- [ ] Configure production environment variables.
-- [ ] Deploy the application.
-- [ ] Configure SPA routing.
-- [ ] Verify production login.
-- [ ] Verify QR codes point to the production URL.
-- [ ] Test student submissions in production.
-- [ ] Test instructor results in production.
+- [x] Create the Cloudflare service (user created Workers static assets instead of Pages).
+- [x] Connect the Cloudflare Worker to the GitHub repository.
+- [x] Configure production environment variables.
+- [x] Deploy the application.
+- [x] Configure SPA routing.
+- [x] Verify production login.
+- [x] Verify QR codes point to the production URL.
+- [x] Test student submissions in production.
+- [x] Test instructor results in production.
 
 ---
+
+- [x] Capture four sanitized database/application evidence screenshots.
+- [x] Prepare development-summary and AI-history drafts.
+- [ ] Complete physical-phone QR/submission verification (user deferred until later).
+- [ ] User will provision a separate grader account and provide credentials privately.
+- [ ] Review/personalize the report and submit through HuskyCT.
 
 # Phase 16 — Post-MVP Enhancements
 

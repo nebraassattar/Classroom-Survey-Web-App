@@ -1,6 +1,6 @@
 # Cloudflare deployment
 
-Deployment status: build configuration in progress. Assigned origin: https://classroom-survey-web-app.nesattar786.workers.dev (not yet verified). The user created a Git-connected Worker in the dashboard, so this release uses Workers static assets. Supabase remains the backend.
+Deployed and browser-verified on 2026-11-03: https://classroom-survey-web-app.nesattar786.workers.dev. Git-integrated build 8717fc6 completed successfully. The user created a Git-connected Worker in the dashboard, so this release uses Workers static assets. Supabase remains the backend.
 
 ## Build settings
 
@@ -56,3 +56,7 @@ A new Pages project can instead use the React (Vite) preset, `npm run build` and
 - [Workers static assets](https://developers.cloudflare.com/workers/static-assets/)
 - [Workers SPA routing](https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/)
 - [Workers build configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/)
+
+## Recorded release checks — 2026-11-03
+
+Public home/student/protected/unknown deep routes passed. Private instructor login, refresh persistence and logout passed. Created and reopened a Draft containing both question types without activating it. One anonymous test submission was stored; refresh showed Already submitted. Results and production CSV matched two stored responses and four answer rows at the evidence checkpoint. The browser-generated QR PNG decoded to the exact public student URL. Supabase Site URL is saved to the production origin; no additional redirect wildcard was added. See DEVELOPMENT_LOG.md for limits and any subsequent user-reported phone check.
