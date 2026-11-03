@@ -188,7 +188,7 @@ describe('survey dashboard', () => {
         await screen.findByRole('article', { name: 'Pointers' }),
       ).getByRole('button', { name: 'Duplicate' }),
     )
-    await screen.findByRole('heading', { name: 'Edit draft details' })
+    await screen.findByRole('heading', { name: 'Edit draft survey' })
     expect(surveyApi.mutate).toHaveBeenCalledWith('duplicate', 'closed-id')
     expect(surveyApi.get).toHaveBeenCalledWith('new-copy')
   })
@@ -204,7 +204,7 @@ describe('survey dashboard', () => {
       null,
       'New draft',
       'Description',
-      undefined,
+      { questions: [] },
     )
     expect(await screen.findByText('Draft saved.')).toBeInTheDocument()
   })

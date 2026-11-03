@@ -351,8 +351,7 @@ export function DashboardPage() {
         </section>
       )}
       <p className="mt-8 text-sm text-slate-600">
-        Question editing, QR presentation and results pages are not available
-        yet.
+        QR presentation and results pages are not available yet.
       </p>
       {confirmation && (
         <ConfirmDialog

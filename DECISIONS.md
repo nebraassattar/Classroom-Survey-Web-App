@@ -31,3 +31,11 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - Add basic draft metadata forms with the dashboard so New/Edit/Duplicate have working destinations. Preserve existing questions/choices in position order through the current atomic save RPC. Full question controls remain Phase 5. Concurrent edits from multiple tabs are last-save-wins while still Draft; activated/historical content remains protected by the database.
 - No results/presentation links until those pages exist. Keep the corresponding checklist work open instead of introducing dead links. Empty drafts may be stored, but the database rejects activation until questions exist.
 - Read all ordered API pages for client-side title/status filtering, then paginate cards locally. A refresh reconciles changes made in another tab. Use native modal dialogs with initial Cancel focus, Escape/cancel and focus restoration; block cancellation while a mutation is in flight. Refuse deletion if response-count lookup fails.
+
+## Phase 5 editor behavior
+
+- Stable client-only keys identify questions/choices during editing and reordering. Save serializes contiguous 1-based positions. Reopen refetches database content; client keys are never persisted or used as database answer IDs.
+- True/False choices are fixed as True then False. Switching types resets choices after confirmation if text would be replaced; question text remains. Multiple-choice controls enforce 2–20 choices; maximum 100 questions. Empty drafts may save, but any added question must be complete.
+- The editor saves through the existing whole-draft RPC. Save and activate uses two existing RPCs; activation failure does not undo a successful draft save. Retain the saved ID for retry. Database lifecycle locking remains authoritative if another tab activates while editing.
+- Back-to-dashboard navigation confirms unsaved edits. Reload/tab-close uses native beforeunload warnings where supported; browser-history navigation is not comprehensively blocked. No autosave or multi-tab merge is claimed.
+- Lazy-load dashboard/editor routes with a loading fallback, addressing the observed bundle warning without claiming measured page-load performance. No SQL migrations or Auth settings changed.

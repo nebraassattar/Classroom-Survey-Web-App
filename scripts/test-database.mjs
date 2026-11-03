@@ -86,6 +86,69 @@ try {
   const first = await save()
   const second = await save('Second survey')
   const empty = await save('Empty draft', [])
+  const originalIds = (
+    await sql(
+      'select id from public.questions where survey_id=$1 order by position',
+      [first],
+    )
+  ).rows
+  await save('Reordered draft', [questions[1], questions[0]], first)
+  assert.deepEqual(
+    (
+      await sql(
+        'select question_type,position from public.questions where survey_id=$1 order by position',
+        [first],
+      )
+    ).rows,
+    [
+      { question_type: 'true_false', position: 1 },
+      { question_type: 'multiple_choice', position: 2 },
+    ],
+  )
+  checks++
+  assert.notDeepEqual(
+    (
+      await sql(
+        'select id from public.questions where survey_id=$1 order by position',
+        [first],
+      )
+    ).rows,
+    originalIds,
+  )
+  checks++
+  await expectError(
+    'select public.save_survey_draft($1,$2,null,$3)',
+    [
+      first,
+      'Must roll back',
+      JSON.stringify([
+        questions[0],
+        { ...questions[1], choices: ['Yes', 'No'] },
+      ]),
+    ],
+    /INVALID_TRUE_FALSE/,
+  )
+  assert.equal(
+    await value('select title as value from public.surveys where id=$1', [
+      first,
+    ]),
+    'Reordered draft',
+  )
+  checks++
+  assert.deepEqual(
+    (
+      await sql(
+        'select question_type,position from public.questions where survey_id=$1 order by position',
+        [first],
+      )
+    ).rows,
+    [
+      { question_type: 'true_false', position: 1 },
+      { question_type: 'multiple_choice', position: 2 },
+    ],
+  )
+  checks++
+  await save('Database test', questions, first)
   assert.equal(
     await value('select count(*)::int as value from public.surveys'),
     3,

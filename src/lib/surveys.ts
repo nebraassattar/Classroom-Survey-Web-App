@@ -10,7 +10,7 @@ export interface Survey {
   created_at: string
   updated_at: string
 }
-interface Question {
+export interface Question {
   question_text: string
   question_type: 'multiple_choice' | 'true_false'
   position: number
@@ -38,6 +38,10 @@ export function surveyError(error: unknown): string {
     SURVEY_NOT_FOUND: 'Survey not found or no longer available.',
     INSTRUCTOR_REQUIRED:
       'Instructor access is required. Sign in again or contact the administrator.',
+    INVALID_TRUE_FALSE:
+      'True/False questions must have exactly True and False choices.',
+    TOO_MANY_QUESTIONS: 'Use no more than 100 questions.',
+    INVALID_QUESTIONS: 'Check your question content and try again.',
   }
   return (
     messages[message] ??
@@ -78,7 +82,7 @@ export const surveyApi = {
     id: string | null,
     title: string,
     description: string,
-    content?: DraftContent,
+    content?: Pick<DraftContent, 'questions'>,
   ) {
     const questions = [...(content?.questions ?? [])]
       .sort((a, b) => a.position - b.position)

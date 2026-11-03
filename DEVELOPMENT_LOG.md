@@ -79,3 +79,16 @@ Validation outcomes will be appended after checks finish. Browser, database, end
 
 - User confirmed the created draft remains after refresh. Recorded actual-account creation/persistence as user-reported; edit, duplicate, archive and deletion behavior were not explicitly confirmed.
 - User requested committing/pushing Phase 4 now and waiting for explicit instruction before starting the next phase. Preparing the reviewed dashboard, basic draft forms, tests and documentation for that push; no Phase 5 question controls started.
+
+## 2026-11-02 — Phase 5 question editor
+
+- Phase 4 was pushed as de4b9de. User explicitly authorized starting the next phase in this turn. Inspected the current editor, data service, tests and database save contract before changing code.
+- Added full multiple-choice/True-False draft question controls with stable UI keys, add/delete, ordered moves, fixed True/False choices, field-level validation and focus, and database-matching cardinality/length limits. Deletion and choice-replacing type changes use confirmations. Existing loaded content sorts by stored positions.
+- Connected complete ordered content to the existing transactional save RPC. Added Save and activate confirmation; a saved draft ID survives activation failure for retry, avoiding another new draft in that case. Added failed-load retry and fail-closed historical editing, and unsaved Back/reload warnings with documented browser-history limits.
+- Added editor tests covering reorder preservation and serialization, cancelled/confirmed deletion/type replacement, required-field focus, fixed True/False, failed-save retry, activation validation/partial success, loaded ordering, historical denial and load retry. Added model boundary/identity tests and database assertions for draft reorder persistence and failed-update rollback.
+- Split protected dashboard/editor page bundles with React lazy/Suspense after the Phase 4 build warned about a chunk exceeding 500 kB. Production build now emits main JavaScript 494.74 kB / 145.05 kB gzip and separate dashboard/editor/shared-data chunks, with no size warning. This is a build measurement, not evidence of the page-load target.
+- No new SQL migration, external setting, hosted data mutation or deployment occurred. No Phase 6 presentation/student/results pages were implemented. Real-account question workflow and native mobile/keyboard/dialog verification remain pending; automated UI tests use fixtures, while database tests run actual SQL on embedded PostgreSQL.
+
+- Final Phase 5 checks passed: 43 component/service/Auth/model tests, 82 embedded PostgreSQL assertions, ESLint with zero warnings, TypeScript via production build, production build, Prettier formatting and Git whitespace checks. Phase 5 changes remain local and uncommitted for review; no real-account question-save test or performance success is claimed.
+
+- User subsequently reported testing the editor and confirmed that everything saves and works as expected, following the suggested question/reorder/save/reopen/refresh checks. Recorded Phase 5 real-account editor/persistence verification as user-reported. This does not establish mobile/native-dialog, concurrency, performance or the later student/QR/results workflow.

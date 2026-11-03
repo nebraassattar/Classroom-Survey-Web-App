@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
@@ -6,24 +6,41 @@ import { SetupPage } from './pages/SetupPage'
 import { AuthProvider } from './auth/AuthProvider'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { SurveyDraftPage } from './pages/SurveyDraftPage'
 import './styles.css'
+
+const DashboardPage = lazy(() =>
+  import('./pages/DashboardPage').then((module) => ({
+    default: module.DashboardPage,
+  })),
+)
+const SurveyDraftPage = lazy(() =>
+  import('./pages/SurveyDraftPage').then((module) => ({
+    default: module.SurveyDraftPage,
+  })),
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/surveys/new" element={<SurveyDraftPage />} />
-            <Route path="/surveys/:id/edit" element={<SurveyDraftPage />} />
-          </Route>
-          <Route path="*" element={<SetupPage notFound />} />
-        </Routes>
+        <Suspense
+          fallback={
+            <main className="px-6 py-12" role="status">
+              Loading page…
+            </main>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/surveys/new" element={<SurveyDraftPage />} />
+              <Route path="/surveys/:id/edit" element={<SurveyDraftPage />} />
+            </Route>
+            <Route path="*" element={<SetupPage notFound />} />
+          </Routes>
+        </Suspense>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

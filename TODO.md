@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-02
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–3 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout are user-confirmed. Phase 4 dashboard and basic draft details are implemented locally; question editing, presentation, student submissions, results and deployment remain pending. Exact migration records, broader hosted checks and full workflow verification remain open.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–4 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout and draft creation/refresh are user-confirmed. Phase 5 question editing is implemented locally; presentation, student submissions, results and deployment remain pending. Exact migration records, broader hosted checks and full workflow verification remain open.
 
 ## Purpose
 
@@ -83,14 +83,14 @@ Implementation checks below are component-tested using SDK fixtures. Real instru
 
 # Phase 4 — Instructor Dashboard
 
-Implementation is verified with component/service fixtures and existing database tests; actual-account dashboard workflow and native-dialog/mobile verification remain pending. New/Edit currently manage title/description; full question editing is Phase 5.
+Implementation is verified with component/service fixtures and existing database tests; actual-account edit/duplicate/lifecycle and native-dialog/mobile verification remain pending. New/Edit now use the Phase 5 question editor.
 
 - [x] Create the dashboard layout.
 - [x] Load surveys from Supabase with ordered API pagination.
 - [x] Display survey title, status, and creation date.
 - [x] Add status badges for Draft, Active, Closed, and Archived.
-- [x] Add a New Survey button and basic draft-details form.
-- [x] Add Edit action for draft details only, preserving question content.
+- [x] Add a New Survey button and draft editor.
+- [x] Add Edit action for drafts, loading question content.
 - [x] Add Duplicate action and redirect to the new draft.
 - [x] Add Delete action with response-count warning and confirmation.
 - [x] Add Archive action with confirmation.
@@ -108,21 +108,28 @@ Implementation is verified with component/service fixtures and existing database
 
 # Phase 5 — Survey Editor
 
-- [x] Create a basic draft-details page (full question editor pending).
+Implemented and component-tested; actual-account question save/reload, mobile and native-dialog checks remain pending. No new migration needed.
+
+- [x] Create the full draft survey editor.
 - [x] Add survey title field.
 - [x] Add optional description field.
-- [ ] Add questions dynamically.
-- [ ] Support Multiple Choice questions.
-- [ ] Support True / False questions.
-- [ ] Add answer choices dynamically.
-- [ ] Reorder questions.
-- [ ] Reorder choices.
-- [ ] Delete questions.
-- [ ] Delete choices.
-- [ ] Validate required fields.
-- [x] Save basic survey details as Draft (question editing pending).
-- [x] Load an existing draft for detail editing, preserving ordered questions/choices.
+- [x] Add questions dynamically.
+- [x] Support Multiple Choice questions.
+- [x] Support True / False questions with fixed choices.
+- [x] Add answer choices dynamically.
+- [x] Reorder questions without losing typed edits.
+- [x] Reorder choices without losing typed edits.
+- [x] Delete questions with confirmation.
+- [x] Delete choices with confirmation, retaining at least two choices.
+- [x] Validate required fields near inputs and focus the first invalid field.
+- [x] Save survey details/questions/choices atomically as Draft.
+- [x] Load an existing draft for editing in stored order.
 - [x] Enforce draft-only editing; Active/Closed/Archived content requires duplication, preserving historical answers.
+- [x] Confirm destructive type changes and unsaved Back navigation.
+- [x] Add Save and activate with confirmation and partial-success/retry handling.
+- [x] Test ordered draft updates and invalid-update rollback in embedded PostgreSQL.
+- [x] Verify real-account question creation/editing, save/reopen/refresh and ordering (user reports the editor saves and works as expected after the suggested checks).
+- [ ] Verify mobile editor, keyboard reordering and native confirmation dialogs.
 
 ---
 
