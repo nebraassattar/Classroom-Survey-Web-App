@@ -106,3 +106,21 @@ Validation outcomes will be appended after checks finish. Browser, database, end
 - Final Phase 6 validation passed: 55 app/QR tests, 82 embedded PostgreSQL assertions, ESLint with zero warnings, TypeScript, production build, Prettier and Git whitespace checks. Real PNG encoding/decoding is verified; actual instructor presentation, browser download, phone/projector scanning and cross-tab updates remain manual checks. Phase 6 changes remain local and uncommitted for review.
 
 - User subsequently reported checking Phase 6 and that it works as expected. Recorded presentation behavior as user-reported; the broad report does not independently establish each phone/projector, download or cross-tab check. User requested committing/pushing Phase 6 and starting the next phase.
+
+## 2026-11-02 — Phase 6 push and Phase 7 anonymous participation
+
+- Committed/pushed Phase 6 as 8c928e3 (`feat: add classroom QR presentation and PNG download`) before starting Phase 7, as requested.
+- Added public /s/:slug route outside instructor providers/guards and a separate anonymous Supabase client, preventing instructor session inheritance. Loads use get_public_survey, and writes use only submit_survey_response. No student Auth accounts or direct response/answer writes are introduced.
+- Added mobile-oriented required radio groups for both types, field-level validation/focus, submission locking, acknowledged-success confirmation and friendly closed/not-found/duplicate/network/storage states. Retains selected answers on retryable failures and never shows raw database errors.
+- Included Phase 8 token foundation because the RPC requires a token: persist a browser UUID before sending, retain it on retries, use existing DB uniqueness, and record per-survey local success markers. Marker failures do not invalidate server success. Documented browser/origin/storage-reset limits and unfinished-answer refresh behavior.
+- Added UI/service/client-isolation tests covering missing answers, exact payload, remount markers, double events, token-preserving network retry, duplicate and closed submissions, failed-load retry, blocked storage, malformed payloads, anonymous client separation and optional marker-write failure. All 73 tests passed before final client/marker additions; final outcomes recorded after checks.
+- Read-only hosted lookup found no currently Active survey. Did not create, activate or submit hosted test data. Real anonymous browser workflow and database-record inspection remain pending; no successful live student submission or mobile/phone scan is claimed.
+- Production build passed: main JS 495.35 kB / 145.22 kB gzip, student route chunk 6.96 kB / 2.77 kB gzip. These do not measure page-load performance. No new migration, deployment or privileged credential was used.
+- Consulted official Supabase RPC documentation: https://supabase.com/docs/reference/javascript/rpc . Phase 9 results/CSV remain unimplemented.
+
+- Final Phase 7 checks passed: 76 app/service/client/QR tests, 82 embedded PostgreSQL assertions, ESLint, TypeScript, production build, Prettier and Git whitespace checks. Student route bundle is 6.96 kB / 2.77 kB gzip; main JS 495.35 kB / 145.22 kB gzip. No actual hosted student submission, mobile behavior or performance target is claimed. Phase 7 changes remain local/uncommitted; Phase 6 is pushed.
+
+## 2026-11-03 — User verification and Phase 7 handoff
+
+- User reports everything works as expected following the suggested anonymous submit, refresh/duplicate, response-count and stored-record checks. Recorded as user-reported workflow verification, not independently inspected evidence. Mobile, uncertain-network replay, multi-session concurrency and performance remain unverified.
+- User requested pushing the current code and moving on. Phase 8's required token/uniqueness foundation is already implemented and tested with Phase 7; proceeding to the next unfinished feature, Phase 9 instructor results. More actual-browser duplicate checks remain tracked rather than claimed complete.

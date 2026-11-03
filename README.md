@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, a full draft question editor and classroom QR presentation with PNG download. Versioned migrations enforce RLS, authorization, lifecycle rules and atomic saves/submissions. Student forms, results/CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
+Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, a full draft editor, classroom QR presentation and anonymous student forms with atomic submissions. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. Results/CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
 
 ## Local setup
 
@@ -59,7 +59,7 @@ Open an existing Draft with **Edit**, or create a new survey. Add questions, sel
 
 Unsaved edits trigger confirmation on the Back to dashboard link, and a browser warning on reload/tab close when supported. Other browser-history transitions are not comprehensively blocked; save before navigating elsewhere. No autosave is implied.
 
-User reports the Phase 5 editor and save/reopen/refresh workflow work as expected after the suggested checks. Mobile/native-dialog verification remains pending. Test Save and activate only on a disposable survey when no classroom collection is active, because it closes the previous Active survey. Student/results pages remain pending.
+User reports the Phase 5 editor and save/reopen/refresh workflow work as expected after the suggested checks. Mobile/native-dialog verification remains pending. Test Save and activate only on a disposable survey when no classroom collection is active, because it closes the previous Active survey. Results pages remain pending.
 
 `npm test` covers editor/service/Auth behavior with fixtures; `npm run test:db` executes real PostgreSQL draft updates, ordering and rollback checks. Protected page bundles load on demand with a loading fallback; build sizes are measured, but the under-two-second page-load target remains unverified.
 
@@ -73,7 +73,21 @@ The QR is a 1024×1024 PNG with a four-module quiet zone and medium error correc
 
 Survey status and response count refresh together, with the next poll scheduled 10 seconds after a successful Active-survey check; requests do not overlap. Refresh is also available manually. Closing elsewhere removes QR/download once detected. A status-fetch failure hides stale sharing information and asks for manual refresh; a count-only failure shows Unavailable, never a false zero. Closing here preserves history and prevents an older Active snapshot from restoring the QR. Counts use instructor-only queries, not a public response-count endpoint.
 
-Manual checks: open an Active survey presentation; verify its title/link; download/open the PNG; confirm a phone scanner recognizes the same URL; refresh; cancel then confirm Close and verify the QR disappears. Use a second instructor tab to activate a different survey and confirm the previous presentation detects closure. **The student response form is Phase 7: the QR target is correct, but `/s/:slug` does not render the survey yet.** Results navigation also remains pending. Actual-account presentation, browser PNG download, phone scan, projector readability and cross-tab status checks have not yet been reported.
+User reports checking the presentation and that it works as expected. Independent browser download, phone/projector and cross-tab checks remain pending. Use a second instructor tab to activate a different survey and confirm the previous presentation detects closure. `/s/:slug` now renders the Phase 7 student form. Results navigation remains pending.
+
+## Phase 7 student form and required duplicate-protection foundation
+
+`/s/:slug` is a public, one-column student page, outside instructor Auth/route guards. It uses a separate non-persistent anonymous Supabase client, so instructor sessions are not attached to student requests. No student Auth account is created. The page loads only through `get_public_survey`; submissions use only `submit_survey_response`, never direct response/answer inserts.
+
+Every question is a required, labeled radio group with large touch targets. Missing-answer errors appear near questions and focus the first missing group. Submission disables controls and guards against repeated events. Success appears only after the RPC confirms storage. Closed, unknown, duplicate, unavailable and validation errors have friendly states without raw database exceptions. Answers remain selected after retryable failures.
+
+The existing RPC requires a UUID browser token, so the Phase 8 foundation is included now: persist a random token locally before sending; retain it on retries; enforce database `(survey_id,anonymous_token)` uniqueness; map duplicate errors. A per-survey local success marker restores Already submitted after refresh. This marker is a UI convenience, not authorization or proof checked by the server. Storage-blocked browsers receive guidance before any submission; failed optional marker writes do not invalidate server success. No token or response ID is displayed, logged or exported by the student page.
+
+If a network response is lost after commit, retrying with the same token may return Already submitted, which prevents a second stored response. Clearing storage, changing browser/profile/origin or using another device can bypass browser-token protection; it is reasonable accidental-duplicate protection, not one-person identity. Responses belong to the survey regardless of browser markers; do not clear tokens to work around an uncertain submission. Student choices are kept in memory only before submission; refreshing an unfinished form can lose those selections.
+
+Manual workflow: activate a disposable complete survey, open Present QR, copy the student URL into an incognito window on the same computer, answer both question types, submit, and refresh to check Already submitted. In the instructor presentation, refresh/wait for the response count. In Supabase Table Editor inspect the new `responses` row and associated `answers`, then refresh again to establish persistence. Do not expose anonymous tokens in screenshots. Open a student form, close the survey in the instructor tab, and confirm a late submission rejects. An unknown slug should show Survey not found.
+
+Phone checks require a reachable LAN/public origin; localhost refers to the phone itself. Real anonymous browser submission, stored-record inspection, duplicate/closure behavior, mobile/two-browser and full QR workflow verification remain pending. A read-only lookup found no active hosted survey during implementation, so the agent did not create or submit hosted data. No new migrations or external configuration are required. Results/CSV are later phases.
 
 ## Architecture and roadmap
 
@@ -84,9 +98,9 @@ React renders routed pages; Tailwind supplies styles; the Supabase client connec
 3. Instructor authentication and protected routes (implemented, component-tested; actual-account login/refresh/logout user-confirmed).
 4. Dashboard, duplication and lifecycle controls (implemented; create/refresh user-confirmed, other actual-account checks pending).
 5. Full question editor (implemented; actual-account workflow user-confirmed).
-6. Classroom presentation with public URLs and downloadable QR PNG (implemented; actual-account/browser/phone verification pending).
-7. Anonymous student forms.
-8. Browser-token duplicate protection in the student UI (database constraint already implemented).
+6. Classroom presentation with public URLs and downloadable QR PNG (implemented; user reports expected behavior; detailed phone/projector/cross-tab checks pending).
+7. Anonymous student forms (implemented; real anonymous submission/persistence verification pending).
+8. Browser-token duplicate protection foundation included with Phase 7 because the submission RPC requires it; actual-browser verification pending.
 9. Results dashboard.
 10. Historical results browsing.
 11. CSV export.

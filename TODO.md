@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-02
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–5 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout, draft persistence and editor behavior are user-confirmed. Phase 6 presentation is implemented locally; student submissions, results and deployment remain pending. Exact migration records, broader hosted checks and full workflow verification remain open.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–6 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout, draft persistence, editor and presentation behavior are user-confirmed. Phase 7 student forms and the required Phase 8 token foundation are implemented locally. Results and deployment, actual anonymous workflow evidence, broader hosted checks and concurrency/performance verification remain pending.
 
 ## Purpose
 
@@ -135,7 +135,7 @@ Implemented and component-tested; actual-account question save/reload, mobile an
 
 # Phase 6 — Survey Activation
 
-Implementation and QR decoding are automatically tested; actual-account/browser/phone/projector checks remain pending. Existing migration/RPC handles activation; no new migration. Student URL targets Phase 7, which is not yet implemented.
+Implementation and QR decoding are automatically tested; presentation behavior is user-reported. Detailed browser/phone/projector checks remain pending. Existing migration/RPC handles activation; no new migration. Student URL now loads the Phase 7 public form.
 
 - [x] Add activation logic (existing authorized RPC, dashboard/editor integration).
 - [x] Ensure at most one survey is Active through the database index and serialized RPC (multi-session verification still pending).
@@ -160,29 +160,40 @@ Implementation and QR decoding are automatically tested; actual-account/browser/
 
 # Phase 7 — Student Survey Page
 
-- [ ] Create the public route `/s/:slug`.
-- [ ] Load the requested active survey.
-- [ ] Show an error if the survey does not exist.
-- [ ] Show a message if the survey is closed.
-- [ ] Render survey title and description.
-- [ ] Render Multiple Choice questions.
-- [ ] Render True / False questions.
-- [ ] Validate required answers.
-- [ ] Add Submit button.
-- [ ] Store response and answers in Supabase.
-- [ ] Show a submission confirmation page.
-- [ ] Make the entire experience mobile friendly.
+Implementation is tested with UI/SDK fixtures plus the existing real embedded PostgreSQL submission tests. Real hosted anonymous submission and record persistence have not yet been observed/reported. Token basics from Phase 8 are necessary here because the RPC requires them; no new migration.
+
+- [x] Create the public route `/s/:slug` outside instructor Auth guards.
+- [x] Load the requested active survey through a dedicated anonymous client/RPC.
+- [x] Show an error if the survey does not exist.
+- [x] Show a message if the survey is closed, including closure during submission.
+- [x] Render survey title and description.
+- [x] Render Multiple Choice questions.
+- [x] Render True / False questions.
+- [x] Validate required answers and focus the first missing group.
+- [x] Add Submit button with in-flight protection and disabled controls.
+- [x] Integrate atomic Supabase response/answer RPC (database-tested; hosted student workflow pending).
+- [x] Show confirmation only on acknowledged success.
+- [x] Implement one-column, large-touch-target responsive layout.
+- [x] Preserve selections and browser token on retryable submission failure.
+- [x] Handle malformed public payloads, loading/retry/error/empty terminal states without raw exceptions.
+- [x] Verify hosted student workflow/persistence (user reports all suggested checks work as expected; not independently inspected).
+- [ ] Verify phone layout, keyboard/screen-reader controls and at least two browsers.
 
 ---
 
 # Phase 8 — Duplicate Submission Protection
 
-- [ ] Generate an anonymous browser token.
-- [ ] Store the token in local storage.
-- [ ] Save the token with each response.
-- [ ] Prevent the same token from submitting twice to the same survey.
-- [ ] Show a friendly message if a duplicate submission is attempted.
-- [ ] Add a database uniqueness constraint if appropriate.
+Required foundation implemented alongside Phase 7; actual-browser/hosted retry verification remains pending. Protection is browser/origin-based, not one-person identity.
+
+- [x] Generate an anonymous UUID browser token.
+- [x] Persist token in local storage before submitting; fail clearly if storage is unavailable.
+- [x] Pass token to the RPC, which stores it with each response.
+- [x] Prevent the same token from submitting twice through mandatory database uniqueness.
+- [x] Show a friendly duplicate message and retain token across uncertain retries.
+- [x] Restore Already submitted from per-survey local success markers.
+- [x] Add a database uniqueness constraint (existing Phase 2 migration).
+- [x] Verify same-browser refresh and response-count behavior (user reports the suggested student workflow works; uncertain-network replay remains independently unverified).
+- [ ] Verify expected separate-browser behavior and document storage-clearing limitations in final report.
 
 ---
 

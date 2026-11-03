@@ -1,6 +1,6 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom'
 import { HomePage } from './pages/HomePage'
 import { SetupPage } from './pages/SetupPage'
 import { AuthProvider } from './auth/AuthProvider'
@@ -23,20 +23,32 @@ const PresentSurveyPage = lazy(() =>
     default: module.PresentSurveyPage,
   })),
 )
+const StudentSurveyPage = lazy(() =>
+  import('./pages/StudentSurveyPage').then((module) => ({
+    default: module.StudentSurveyPage,
+  })),
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <Suspense
-          fallback={
-            <main className="px-6 py-12" role="status">
-              Loading page…
-            </main>
-          }
-        >
-          <Routes>
-            <Route path="/" element={<HomePage />} />
+      <Suspense
+        fallback={
+          <main className="px-6 py-12" role="status">
+            Loading page…
+          </main>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/s/:slug" element={<StudentSurveyPage />} />
+          <Route
+            element={
+              <AuthProvider>
+                <Outlet />
+              </AuthProvider>
+            }
+          >
             <Route path="/login" element={<LoginPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
@@ -47,10 +59,10 @@ createRoot(document.getElementById('root')!).render(
                 element={<PresentSurveyPage />}
               />
             </Route>
-            <Route path="*" element={<SetupPage notFound />} />
-          </Routes>
-        </Suspense>
-      </AuthProvider>
+          </Route>
+          <Route path="*" element={<SetupPage notFound />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   </StrictMode>,
 )

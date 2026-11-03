@@ -359,7 +359,7 @@ export function DashboardPage() {
         </section>
       )}
       <p className="mt-8 text-sm text-slate-600">
-        Student response forms and results pages are not available yet.
+        Results pages are not available yet.
       </p>
       {confirmation && (
         <ConfirmDialog

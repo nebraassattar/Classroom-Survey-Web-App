@@ -201,9 +201,6 @@ function Presentation({ id }: { id: string }) {
                           origin for classroom use.
                         </p>
                       )}
-                      <p className="mt-3 text-sm text-slate-600">
-                        Student response forms are not available yet.
-                      </p>
                     </>
                   )}
                 </>
