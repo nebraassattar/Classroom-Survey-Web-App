@@ -64,3 +64,9 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - Percentages use all survey responses; show one decimal place, zero choices and explicit answered/unanswered totals. Required current submissions are complete, but the display also handles incomplete historical/admin-imported data without concealing it.
 - Use horizontal count charts with numbered choices and a semantic full-text numeric table. Enable Recharts accessibility; defer actual browser/screen-reader evidence to verification. Results are loaded on demand, not through Realtime.
 - Preserve a labelled prior snapshot on transient refresh failures; clear it on access revocation or missing/deleted survey. Closed/Archived viewing ships with this route; date filtering and CSV remain separately planned work.
+
+## Phase 10 historical date filtering
+
+- Interpret unspecified date filtering as survey creation dates, explicitly labelled Created from/through. This matches existing card dates and avoids implying filters on student submission timestamps. Compare inclusive local calendar dates, not UTC date strings or fixed 24-hour intervals.
+- Either date may be blank. Combine all selected criteria; reset pagination after changing a bound. Show an error for a reversed range and suppress misleading empty counts. Clear filters resets all criteria and pagination without re-fetching or modifying data.
+- Apply filters to the existing complete loaded list, including Closed/Archived surveys. No schema or policy change. Filters reset when the dashboard remounts; saved preferences are outside this phase.

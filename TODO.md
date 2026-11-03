@@ -2,7 +2,7 @@
 
 ## Audit status — 2026-11-03
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–7 and the Phase 8 duplicate foundation are committed/pushed. Real login, draft/editor/presentation and suggested student workflows are user-reported successful. Phase 9 results are implemented locally, including Closed/Archived viewing. Date filters, CSV, deployment, evidence capture, broader hosted/concurrency and performance checks remain pending.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–9 (including the Phase 8 duplicate foundation) are committed/pushed. Real login, draft/editor/presentation and suggested student workflows are user-reported successful; results verification is still pending. Phase 10 historical created-date filters are implemented locally. CSV, deployment, evidence capture, broader hosted/concurrency and performance checks remain pending.
 
 ## Purpose
 
@@ -218,11 +218,16 @@ Implemented with component/service/chart and database tests; real instructor res
 
 # Phase 10 — Historical Results
 
+Implementation and targeted date/dashboard/results regressions pass; actual-account historical/date-picker/mobile verification remains pending. Date filters use inclusive survey creation dates in device-local time, matching card dates; no new migration or data writes.
+
 - [x] Allow viewing results for Closed surveys (implementation/component/database tested; actual-account check pending).
 - [x] Allow viewing results for Archived surveys (implementation/component/database tested; actual-account check pending).
-- [ ] Add filtering by date.
+- [x] Add inclusive Created from/through filters with optional bounds, invalid-range feedback and local-calendar/DST-safe comparisons.
 - [x] Add filtering by survey title (existing dashboard search covers history).
 - [x] Preserve historical response data through close/archive (database-tested).
+- [x] Combine date range with title/status, reset pagination on date changes and add Clear filters.
+- [x] Verify historical/date filtering behavior (user reports it is all good after the suggested checks).
+- [ ] Independently verify mobile/native date pickers and historical results evidence.
 
 ---
 

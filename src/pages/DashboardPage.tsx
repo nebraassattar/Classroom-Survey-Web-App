@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../auth/AuthContext'
 import { LogoutButton } from '../components/LogoutButton'
 import { ConfirmDialog } from '../components/ConfirmDialog'
+import { matchesSurveyDates } from '../lib/surveyDates'
 import {
   surveyApi,
   surveyError,
@@ -42,6 +43,8 @@ export function DashboardPage() {
   )
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState<SurveyStatus | 'all'>('all')
+  const [fromDate, setFromDate] = useState('')
+  const [throughDate, setThroughDate] = useState('')
   const [page, setPage] = useState(1)
   const [busy, setBusy] = useState(false)
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
@@ -128,12 +131,17 @@ export function DashboardPage() {
       setBusy(false)
     }
   }
+  const dateError =
+    fromDate && throughDate && fromDate > throughDate
+      ? 'Created from must be on or before Created through.'
+      : null
   const filtered = surveys.filter(
     (survey) =>
       (status === 'all' || survey.status === status) &&
       survey.title
         .toLocaleLowerCase()
-        .includes(search.trim().toLocaleLowerCase()),
+        .includes(search.trim().toLocaleLowerCase()) &&
+      matchesSurveyDates(survey.created_at, fromDate, throughDate),
   )
   const pages = Math.max(1, Math.ceil(filtered.length / 12))
   const currentPage = Math.min(page, pages)
@@ -204,7 +212,66 @@ export function DashboardPage() {
           >
             {loading ? 'Loading…' : 'Refresh surveys'}
           </button>
+          <button
+            type="button"
+            className="button-secondary"
+            disabled={!search && status === 'all' && !fromDate && !throughDate}
+            onClick={() => {
+              setSearch('')
+              setStatus('all')
+              setFromDate('')
+              setThroughDate('')
+              setPage(1)
+            }}
+          >
+            Clear filters
+          </button>
         </div>
+        <div className="mt-5 flex flex-wrap gap-4">
+          <div className="min-w-0 flex-1 basis-48">
+            <label htmlFor="from-date" className="mb-2 block font-medium">
+              Created from
+            </label>
+            <input
+              id="from-date"
+              type="date"
+              className="field"
+              value={fromDate}
+              aria-invalid={Boolean(dateError)}
+              aria-describedby={`date-filter-help${dateError ? ' date-range-error' : ''}`}
+              onChange={(event) => {
+                setFromDate(event.target.value)
+                setPage(1)
+              }}
+            />
+          </div>
+          <div className="min-w-0 flex-1 basis-48">
+            <label htmlFor="through-date" className="mb-2 block font-medium">
+              Created through
+            </label>
+            <input
+              id="through-date"
+              type="date"
+              className="field"
+              value={throughDate}
+              aria-invalid={Boolean(dateError)}
+              aria-describedby={`date-filter-help${dateError ? ' date-range-error' : ''}`}
+              onChange={(event) => {
+                setThroughDate(event.target.value)
+                setPage(1)
+              }}
+            />
+          </div>
+        </div>
+        <p id="date-filter-help" className="mt-3 text-sm text-slate-600">
+          Creation dates in your device’s local time. Both dates are included;
+          either date may be left blank.
+        </p>
+        {dateError && (
+          <p id="date-range-error" role="alert" className="mt-3 text-red-800">
+            {dateError}
+          </p>
+        )}
       </section>
       {notice && (
         <p className="mt-5 text-teal-900" role="status">
@@ -220,7 +287,7 @@ export function DashboardPage() {
         <p className="mt-8" role="status">
           Loading surveys…
         </p>
-      ) : surveys.length === 0 && !error ? (
+      ) : dateError ? null : surveys.length === 0 && !error ? (
         <section className="mt-8 rounded-xl border border-slate-200 bg-white p-8">
           <h2 className="text-xl font-semibold">
             You have not created any surveys yet.

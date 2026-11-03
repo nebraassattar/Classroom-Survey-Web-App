@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, draft editing, classroom QR presentation, anonymous atomic submissions and instructor results with counts, percentages and Recharts charts. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. Historical date filters, CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
+Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, draft editing, classroom QR presentation, anonymous atomic submissions and instructor results with counts, percentages and Recharts charts. Historical surveys can be filtered by title, status and creation date. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
 
 ## Local setup
 
@@ -97,11 +97,19 @@ Each question shows answered/unanswered counts, a horizontal Recharts count char
 
 Charts number choices to avoid truncating long answer text; the matching table includes the full text and exact values. Recharts keyboard accessibility is enabled, and numerical tables avoid reliance on color or tooltips. Chart rendering is tested with real Recharts SVG and fixed test-container dimensions; actual browser resizing, phone layout and screen-reader interaction still need manual checks.
 
-Use **Refresh results** for new submissions; results do not subscribe to Realtime or poll automatically. A transient refresh failure retains the previous snapshot with a clear stale-data message and last-loaded time. Authorization failures and missing/deleted surveys clear the snapshot. Malformed aggregate payloads are rejected rather than displayed as zero. Closed/Archived history is supported now; date filtering remains Phase 10 and CSV remains Phase 11. Active results link back to Present QR.
+Use **Refresh results** for new submissions; results do not subscribe to Realtime or poll automatically. A transient refresh failure retains the previous snapshot with a clear stale-data message and last-loaded time. Authorization failures and missing/deleted surveys clear the snapshot. Malformed aggregate payloads are rejected rather than displayed as zero. Closed/Archived history and Phase 10 date filtering are implemented; CSV remains Phase 11. Active results link back to Present QR.
 
 Manual checks: open a survey with known stored submissions, compare totals and per-choice percentages to Supabase, submit a response from a different browser/profile, then refresh results. Verify both question types, zero-choice counts, a survey with no responses and long answer text. Close/archive the test survey and ensure results remain available without a Present QR link. Try a signed-out results URL and confirm login redirect. Do not alter real classroom data just to create a test case; use a disposable survey and the normal lifecycle confirmations.
 
 No new migration is needed. Database tests cover mixed counts, 66.7%/33.3% rounding, zero-count choices, authorization and preserved history. Actual-account results, responsive charts and comparison screenshots remain pending. Tests encountered sandbox worker-start/timeouts; running the fixture suite outside the sandbox passed. Vitest uses at most two workers to bound resource usage. Run checks in your normal terminal if sandbox workers cannot start.
+
+## Phase 10 historical filters
+
+In the dashboard, combine title search and Closed/Archived status with **Created from** and **Created through**. These dates filter the survey's creation timestamp, not its activation or student submission dates. They match the calendar date shown on the card in your device's local time, and include the entire first/last day. Either bound can be blank. Calendar comparisons cover daylight-saving transition days without assuming every day is 24 hours.
+
+An inverted range shows an inline error and hides the filtered list until corrected, rather than claiming no surveys exist. Date changes reset pagination. **Clear filters** resets title, status, dates and page together. Filtering uses the already loaded survey list and does not change any survey, question or response record. Open **View results** on a matching historical card to inspect preserved data. Filters currently reset when the dashboard is remounted; no saved filter preferences are implied.
+
+Manual check: select Closed or Archived, set dates around the creation date printed on a card, combine with title search, and verify View results still opens the correct survey. Test a same-day range, either bound alone, an inverted range and Clear filters. Real-account/date-picker/mobile checks remain pending. No database migration or external configuration is needed; CSV export is the next phase.
 
 ## Architecture and roadmap
 
@@ -116,7 +124,7 @@ React renders routed pages; Tailwind supplies styles; the Supabase clients conne
 7. Anonymous student forms (implemented; suggested workflow user-reported successful).
 8. Browser-token duplicate protection included with Phase 7; basic refresh/count behavior user-reported, broader retry/multi-browser verification pending.
 9. Results dashboard (implemented; actual-account results verification pending).
-10. Closed/Archived history supported by results page; date filtering pending.
+10. Historical results and title/status/created-date filters (implemented; manual date-filter verification pending).
 11. CSV export.
 12. Duplication integration verification (backend/dashboard already implemented).
 13. UI polish and accessibility.

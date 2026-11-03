@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -69,6 +69,62 @@ beforeEach(() => {
     .mockResolvedValue({ ...items[0], questions: [] })
 })
 describe('survey dashboard', () => {
+  it('combines an inclusive created-date range with title/status and preserves history links', async () => {
+    vi.mocked(surveyApi.list).mockResolvedValue([
+      {
+        ...survey('old', 'Historical recursion', 'closed'),
+        created_at: '2026-10-10T12:00:00Z',
+      },
+      {
+        ...survey('match', 'Historical recursion', 'archived'),
+        created_at: '2026-11-02T12:00:00Z',
+      },
+      {
+        ...survey('later', 'Historical recursion', 'archived'),
+        created_at: '2026-11-04T12:00:00Z',
+      },
+    ])
+    mount()
+    await screen.findAllByRole('article')
+    fireEvent.change(screen.getByLabelText('Created from'), {
+      target: { value: '2026-11-02' },
+    })
+    fireEvent.change(screen.getByLabelText('Created through'), {
+      target: { value: '2026-11-02' },
+    })
+    await userEvent.type(screen.getByLabelText('Search by title'), 'recursion')
+    await userEvent.selectOptions(screen.getByLabelText('Status'), 'archived')
+    expect(screen.getAllByRole('article')).toHaveLength(1)
+    expect(
+      within(screen.getByRole('article')).getByRole('link', {
+        name: 'View results',
+      }),
+    ).toHaveAttribute('href', '/surveys/match/results')
+    expect(surveyApi.mutate).not.toHaveBeenCalled()
+    await userEvent.click(screen.getByRole('button', { name: 'Clear filters' }))
+    expect(screen.getAllByRole('article')).toHaveLength(3)
+    expect(screen.getByLabelText('Created from')).toHaveValue('')
+    expect(screen.getByLabelText('Status')).toHaveValue('all')
+  })
+  it('explains reversed date ranges instead of showing a misleading empty result', async () => {
+    mount()
+    await screen.findByRole('article', { name: 'Recursion check' })
+    fireEvent.change(screen.getByLabelText('Created from'), {
+      target: { value: '2026-11-03' },
+    })
+    fireEvent.change(screen.getByLabelText('Created through'), {
+      target: { value: '2026-11-02' },
+    })
+    expect(screen.getByRole('alert')).toHaveTextContent('must be on or before')
+    expect(screen.getByLabelText('Created from')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
+    expect(
+      screen.queryByText('No surveys match your search.'),
+    ).not.toBeInTheDocument()
+    expect(screen.queryByRole('article')).not.toBeInTheDocument()
+  })
   it('loads real-service results and combines title search with status filtering', async () => {
     mount()
     await screen.findByRole('article', { name: 'Recursion check' })
