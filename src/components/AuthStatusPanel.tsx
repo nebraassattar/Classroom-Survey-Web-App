@@ -6,6 +6,8 @@ export function AuthStatusPanel() {
   const { status, session, retry } = useAuth()
   return (
     <main
+      id="main-content"
+      tabIndex={-1}
       className="mx-auto max-w-xl px-6 py-20"
       aria-busy={status === 'loading'}
     >

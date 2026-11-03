@@ -15,6 +15,7 @@ export function StudentSurveyPage() {
   return <StudentForm key={slug} slug={slug!} />
 }
 function StudentForm({ slug }: { slug: string }) {
+  const terminalHeading = useRef<HTMLHeadingElement>(null)
   const [survey, setSurvey] = useState<StudentSurvey | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
@@ -108,8 +109,15 @@ function StudentForm({ slug }: { slug: string }) {
       : survey?.state === 'not_found'
         ? 'not_found'
         : null)
+  useEffect(() => {
+    if (!loading && !loadError && terminal) terminalHeading.current?.focus()
+  }, [loading, loadError, terminal])
   return (
-    <main className="mx-auto max-w-2xl px-5 py-10 sm:py-14">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-2xl px-5 py-10 sm:py-14"
+    >
       {loading ? (
         <p role="status" className="text-lg">
           Loading survey…
@@ -130,7 +138,11 @@ function StudentForm({ slug }: { slug: string }) {
         </section>
       ) : terminal ? (
         <section aria-live="polite">
-          <h1 className="text-3xl font-semibold">
+          <h1
+            ref={terminalHeading}
+            tabIndex={-1}
+            className="text-3xl font-semibold"
+          >
             {terminal === 'success'
               ? 'Thank you!'
               : terminal === 'duplicate'

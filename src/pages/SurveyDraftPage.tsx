@@ -212,7 +212,11 @@ function DraftEditor({ id }: { id?: string }) {
                   : 'Delete choice',
             }
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-3xl px-6 py-12"
+    >
       <Link
         className="text-teal-800 underline"
         to="/dashboard"

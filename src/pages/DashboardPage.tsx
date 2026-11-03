@@ -148,7 +148,11 @@ export function DashboardPage() {
   const visible = filtered.slice((currentPage - 1) * 12, currentPage * 12)
   const blocked = loading || busy || Boolean(error)
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-5xl px-6 py-12"
+    >
       <header className="flex flex-wrap items-start justify-between gap-6">
         <div>
           <p className="font-semibold text-teal-800">Classroom Survey</p>

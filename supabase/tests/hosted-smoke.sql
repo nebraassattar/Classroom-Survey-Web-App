@@ -30,6 +30,9 @@ begin
   begin perform 1 from public.responses; exception when insufficient_privilege then v_denied := true; end;
   if not v_denied then raise exception 'Anonymous response reads allowed'; end if;
   v_denied := false;
+  begin perform public.get_survey_export(v_context.survey); exception when insufficient_privilege then v_denied := true; end;
+  if not v_denied then raise exception 'Anonymous export allowed'; end if;
+  v_denied := false;
   begin delete from public.surveys where id = v_context.survey; exception when insufficient_privilege then v_denied := true; end;
   if not v_denied then raise exception 'Anonymous mutation allowed'; end if;
   perform public.submit_survey_response(v_context.survey, v_token, v_context.payload);
@@ -48,6 +51,8 @@ do $$
 declare v_id uuid := (select survey from test_context);
 begin
   if (public.get_survey_results(v_id)->>'response_count')::int <> 1 then raise exception 'Wrong stored count'; end if;
+  if jsonb_array_length(public.get_survey_export(v_id)->'responses') <> 1 then raise exception 'Wrong export count'; end if;
+  if public.get_survey_export(v_id)::text like '%"anonymous_token"%' then raise exception 'Export exposed browser token'; end if;
   perform public.close_survey(v_id);
 end $$;
 select set_config('request.jwt.claim.sub', gen_random_uuid()::text, true);
@@ -62,6 +67,13 @@ begin
     v_denied := true;
   end;
   if not v_denied then raise exception 'Non-instructor results allowed'; end if;
+  v_denied := false;
+  begin perform public.get_survey_export((select survey from test_context));
+  exception when raise_exception then
+    if sqlerrm <> 'INSTRUCTOR_REQUIRED' then raise; end if;
+    v_denied := true;
+  end;
+  if not v_denied then raise exception 'Non-instructor export allowed'; end if;
 end $$;
 set local role anon;
 select set_config('request.jwt.claim.sub', '', true);

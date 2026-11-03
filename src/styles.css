@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 
 @layer components {
+  .skip-link {
+    @apply fixed top-3 left-3 z-50 -translate-y-32 rounded-lg bg-teal-900 px-5 py-3 font-semibold text-white focus:translate-y-0;
+  }
   .button-primary {
     @apply min-h-11 rounded-lg bg-teal-800 px-5 py-3 font-semibold text-white hover:bg-teal-900 disabled:cursor-wait disabled:opacity-60;
   }
@@ -24,7 +27,9 @@
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible,
-  fieldset:focus-visible {
+  fieldset:focus-visible,
+  h1:focus-visible,
+  main:focus-visible {
     outline: 3px solid #0f766e;
     outline-offset: 4px;
   }

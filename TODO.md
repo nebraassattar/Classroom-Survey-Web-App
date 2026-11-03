@@ -2,7 +2,9 @@
 
 ## Audit status — 2026-11-03
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–9 (including the Phase 8 duplicate foundation) are committed/pushed. Real login, draft/editor/presentation and suggested student workflows are user-reported successful; results verification is still pending. Phase 10 historical created-date filters are implemented locally. CSV, deployment, evidence capture, broader hosted/concurrency and performance checks remain pending.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–10 (including the Phase 8 duplicate foundation) are committed/pushed. Real login, draft/editor/presentation, student and date-filter workflows are user-reported successful; detailed results/evidence checks remain pending. Combined 11–12 CSV/duplication is implemented/tested locally. Hosted export migration, browser/spreadsheet review, final polish/testing, deployment and evidence remain pending.
+
+User-approved remaining batches: 11–12 CSV plus duplication verification; 13–14 polish plus full testing; 15 deployment plus submission. Phase 16 is excluded.
 
 ## Purpose
 
@@ -233,57 +235,71 @@ Implementation and targeted date/dashboard/results regressions pass; actual-acco
 
 # Phase 11 — CSV Export
 
-- [ ] Add Export CSV button.
-- [ ] Export survey metadata.
-- [ ] Export one row per response.
-- [ ] Include submission timestamp.
-- [ ] Include each question and answer.
-- [ ] Create safe CSV escaping.
+Implemented locally using a new instructor-only snapshot RPC. Apply only `202611030003_csv_export.sql` to the existing hosted project before testing. Automated parser tests do not establish actual Excel/browser behavior.
+
+- [x] Add Export CSV button with pending/error feedback and duplicate-request guard.
+- [x] Export survey metadata on every response row.
+- [x] Export one row per response; disable export for no-response surveys.
+- [x] Include response ID and ISO submission timestamp.
+- [x] Include ordered question headers and answer text, with blank historical missing answers.
+- [x] Create CSV quoting/escaping, UTF-8 BOM and formula-leading text protection.
+- [x] Exclude browser tokens and Auth data.
+- [x] Add versioned, instructor-only, consistent-snapshot export RPC.
+- [x] Verify parser round-trip, export errors, permissions and token exclusion automatically.
+- [x] Hosted export RPC installation confirmed by successful instructor export on 2026-11-03.
+- [x] Verify real Chrome download and matching response values through instructor-only hosted RPC (2026-11-03).
 - [ ] Test export with spreadsheet applications.
 
 ---
 
 # Phase 12 — Survey Duplication
 
-- [ ] Duplicate survey title and description.
-- [ ] Duplicate questions.
-- [ ] Duplicate answer choices.
-- [ ] Create the copy in Draft state.
-- [ ] Add "Copy of ..." naming.
-- [ ] Redirect to the editor after duplication.
+Implementation existed before this batch; complete backend content/identity checks are now included. Actual manual copy/original comparison remains pending.
+
+- [x] Duplicate survey title and description.
+- [x] Duplicate both question types in order with new IDs.
+- [x] Duplicate answer choices in order with new IDs.
+- [x] Create the copy in Draft state with no responses or public slug.
+- [x] Add "Copy of ..." naming.
+- [x] Redirect to the editor after duplication (component-tested).
+- [ ] Verify manual duplication/edit of the copy leaves the original survey/history unchanged.
 
 ---
 
 # Phase 13 — UI Polish
 
-- [ ] Add consistent page layouts.
-- [ ] Improve mobile responsiveness.
-- [ ] Add loading states.
-- [ ] Add empty states.
-- [ ] Add error messages.
-- [ ] Add confirmation dialogs for destructive actions.
-- [ ] Improve QR-code presentation for classroom projection.
-- [ ] Test accessibility and keyboard navigation.
+Implemented and regression-tested. Browser checks cover narrow public/dashboard/results layouts and dialog cancellation. Color contrast, screen-reader and physical projector verification remain open; see DEVELOPMENT_LOG.md.
+
+- [x] Add consistent page layouts.
+- [x] Improve mobile responsiveness.
+- [x] Add loading states.
+- [x] Add empty states.
+- [x] Add error messages.
+- [x] Add confirmation dialogs for destructive actions.
+- [x] Improve QR-code presentation for classroom projection.
+- [x] Test accessibility and keyboard navigation.
 - [ ] Improve color contrast.
 
 ---
 
 # Phase 14 — Testing
 
+Checked items have automated coverage and/or recorded user reports; they do not imply every hosted/browser scenario passed. Current batch: 116 app tests and 104 embedded database assertions. Cross-engine, spreadsheet, physical-device, real concurrency and performance gates remain open in VERIFICATION.md.
+
 - [x] Test instructor login (component-tested and user-confirmed with real account).
-- [ ] Test survey creation.
-- [ ] Test survey editing.
-- [ ] Test activation.
-- [ ] Test closing surveys.
-- [ ] Test QR-code links.
-- [ ] Test student submissions.
-- [ ] Test duplicate-submission prevention.
-- [ ] Test results calculations.
-- [ ] Test CSV export.
-- [ ] Test mobile layout.
+- [x] Test survey creation.
+- [x] Test survey editing.
+- [x] Test activation.
+- [x] Test closing surveys.
+- [x] Test QR-code links.
+- [x] Test student submissions.
+- [x] Test duplicate-submission prevention.
+- [x] Test results calculations.
+- [x] Test CSV export.
+- [x] Test mobile layout.
 - [ ] Test with at least two browsers.
-- [ ] Test unauthorized access attempts.
-- [ ] Test database Row Level Security.
+- [x] Test unauthorized access attempts.
+- [x] Test database Row Level Security.
 
 ---
 

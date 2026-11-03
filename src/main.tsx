@@ -7,6 +7,8 @@ import { AuthProvider } from './auth/AuthProvider'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { LoginPage } from './pages/LoginPage'
 import './styles.css'
+import { AppErrorBoundary } from './components/AppErrorBoundary'
+import { NavigationAccessibility } from './components/NavigationAccessibility'
 
 const DashboardPage = lazy(() =>
   import('./pages/DashboardPage').then((module) => ({
@@ -37,38 +39,46 @@ const ResultsPage = lazy(() =>
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Suspense
-        fallback={
-          <main className="px-6 py-12" role="status">
-            Loading page…
-          </main>
-        }
-      >
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/s/:slug" element={<StudentSurveyPage />} />
-          <Route
-            element={
-              <AuthProvider>
-                <Outlet />
-              </AuthProvider>
-            }
-          >
-            <Route path="/login" element={<LoginPage />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/surveys/new" element={<SurveyDraftPage />} />
-              <Route path="/surveys/:id/edit" element={<SurveyDraftPage />} />
-              <Route path="/surveys/:id/results" element={<ResultsPage />} />
-              <Route
-                path="/surveys/:id/present"
-                element={<PresentSurveyPage />}
-              />
+      <NavigationAccessibility />
+      <AppErrorBoundary>
+        <Suspense
+          fallback={
+            <main
+              id="main-content"
+              tabIndex={-1}
+              className="px-6 py-12"
+              role="status"
+            >
+              Loading page…
+            </main>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/s/:slug" element={<StudentSurveyPage />} />
+            <Route
+              element={
+                <AuthProvider>
+                  <Outlet />
+                </AuthProvider>
+              }
+            >
+              <Route path="/login" element={<LoginPage />} />
+              <Route element={<ProtectedRoute />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/surveys/new" element={<SurveyDraftPage />} />
+                <Route path="/surveys/:id/edit" element={<SurveyDraftPage />} />
+                <Route path="/surveys/:id/results" element={<ResultsPage />} />
+                <Route
+                  path="/surveys/:id/present"
+                  element={<PresentSurveyPage />}
+                />
+              </Route>
             </Route>
-          </Route>
-          <Route path="*" element={<SetupPage notFound />} />
-        </Routes>
-      </Suspense>
+            <Route path="*" element={<SetupPage />} />
+          </Routes>
+        </Suspense>
+      </AppErrorBoundary>
     </BrowserRouter>
   </StrictMode>,
 )

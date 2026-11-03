@@ -239,6 +239,11 @@ try {
     /permission denied/,
   )
   await expectError(
+    'select public.get_survey_export($1)',
+    [first],
+    /permission denied/,
+  )
+  await expectError(
     'select * from private.instructors',
     [],
     /permission denied/,
@@ -334,6 +339,7 @@ try {
     'delete_survey',
     'duplicate_survey',
     'get_survey_results',
+    'get_survey_export',
   ]) {
     await expectError(
       `select public.${rpc}($1)`,
@@ -359,6 +365,21 @@ try {
 
   await role('authenticated', instructor)
   const result = await results(first)
+  const exported = await value('select public.get_survey_export($1) as value', [
+    first,
+  ])
+  assert.equal(exported.survey.id, first)
+  checks++
+  assert.equal(exported.responses.length, 1)
+  checks++
+  assert.equal(exported.responses[0].answers.length, 2)
+  checks++
+  assert.equal(exported.questions.length, 2)
+  checks++
+  assert.equal(JSON.stringify(exported).includes('anonymous_token'), false)
+  checks++
+  assert.equal(JSON.stringify(exported).includes(token), false)
+  checks++
   assert.equal(result.response_count, 1)
   checks++
   assert.equal(
@@ -419,6 +440,55 @@ try {
   const copy = await value('select public.duplicate_survey($1) as value', [
     first,
   ])
+  const copied = await value('select public.get_survey_export($1) as value', [
+    copy,
+  ])
+  const source = await value('select public.get_survey_export($1) as value', [
+    first,
+  ])
+  assert.equal(copied.survey.title, `Copy of ${source.survey.title}`)
+  checks++
+  assert.equal(copied.survey.description, source.survey.description)
+  checks++
+  assert.equal(copied.survey.status, 'draft')
+  checks++
+  assert.equal(copied.survey.public_slug, null)
+  checks++
+  const contentOnly = (item) =>
+    item.questions.map((q) => ({
+      text: q.question_text,
+      position: q.position,
+      choices: q.choices.map((c) => ({
+        text: c.choice_text,
+        position: c.position,
+      })),
+    }))
+  assert.deepEqual(contentOnly(copied), contentOnly(source))
+  checks++
+  assert.deepEqual(
+    (
+      await sql(
+        'select question_type from public.questions where survey_id=$1 order by position',
+        [copy],
+      )
+    ).rows,
+    (
+      await sql(
+        'select question_type from public.questions where survey_id=$1 order by position',
+        [first],
+      )
+    ).rows,
+  )
+  checks++
+  assert.notEqual(copied.questions[0].id, source.questions[0].id)
+  checks++
+  assert.notEqual(
+    copied.questions[0].choices[0].id,
+    source.questions[0].choices[0].id,
+  )
+  checks++
+  assert.equal(copied.responses.length, 0)
+  checks++
   assert.equal((await results(copy)).response_count, 0)
   checks++
   assert.equal(

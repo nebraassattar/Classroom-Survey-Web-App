@@ -2,7 +2,11 @@ import { Link } from 'react-router-dom'
 
 export function HomePage() {
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-16">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center px-6 py-16"
+    >
       <p className="mb-5 font-semibold tracking-widest text-teal-800">
         CLASSROOM SURVEY
       </p>

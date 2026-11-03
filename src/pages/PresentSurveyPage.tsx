@@ -121,7 +121,11 @@ function Presentation({ id }: { id: string }) {
   const png = url && qr?.url === url && !qrError ? qr.png : null
   const local = url ? isLocalHost(new URL(url).hostname) : false
   return (
-    <main className="mx-auto max-w-6xl px-6 py-8 text-center sm:py-12">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-6xl px-6 py-8 text-center sm:py-12"
+    >
       <Link className="inline-block text-teal-800 underline" to="/dashboard">
         Back to dashboard
       </Link>

@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, draft editing, classroom QR presentation, anonymous atomic submissions and instructor results with counts, percentages and Recharts charts. Historical surveys can be filtered by title, status and creation date. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
+Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, draft editing, classroom QR presentation, anonymous atomic submissions, instructor charts/history and CSV export. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. CSV requires the new export migration in the hosted project. Final polish/testing, deployment and submission evidence remain pending. No mock data is used in the application; automated tests use isolated fixtures.
 
 ## Local setup
 
@@ -87,7 +87,7 @@ If a network response is lost after commit, retrying with the same token may ret
 
 Manual workflow: activate a disposable complete survey, open Present QR, copy the student URL into an incognito window on the same computer, answer both question types, submit, and refresh to check Already submitted. In the instructor presentation, refresh/wait for the response count. In Supabase Table Editor inspect the new `responses` row and associated `answers`, then refresh again to establish persistence. Do not expose anonymous tokens in screenshots. Open a student form, close the survey in the instructor tab, and confirm a late submission rejects. An unknown slug should show Survey not found.
 
-User subsequently reported the suggested student submission, refresh/duplicate, response-count and stored-record workflow works as expected. This is user-reported verification, not independently captured database evidence. Phone checks require a reachable LAN/public origin; localhost refers to the phone itself. Detailed mobile/two-browser, uncertain-network replay and concurrent closure checks remain pending. The agent did not create or submit hosted data. No new migrations or external configuration are required. CSV is a later phase.
+User subsequently reported the suggested student submission, refresh/duplicate, response-count and stored-record workflow works as expected. This is user-reported verification, not independently captured database evidence. Phone checks require a reachable LAN/public origin; localhost refers to the phone itself. Detailed mobile/two-browser, uncertain-network replay and concurrent closure checks remain pending. The agent did not create or submit hosted data. Student participation needs no additional migration; CSV requires the export migration below.
 
 ## Phase 9 instructor results
 
@@ -97,7 +97,7 @@ Each question shows answered/unanswered counts, a horizontal Recharts count char
 
 Charts number choices to avoid truncating long answer text; the matching table includes the full text and exact values. Recharts keyboard accessibility is enabled, and numerical tables avoid reliance on color or tooltips. Chart rendering is tested with real Recharts SVG and fixed test-container dimensions; actual browser resizing, phone layout and screen-reader interaction still need manual checks.
 
-Use **Refresh results** for new submissions; results do not subscribe to Realtime or poll automatically. A transient refresh failure retains the previous snapshot with a clear stale-data message and last-loaded time. Authorization failures and missing/deleted surveys clear the snapshot. Malformed aggregate payloads are rejected rather than displayed as zero. Closed/Archived history and Phase 10 date filtering are implemented; CSV remains Phase 11. Active results link back to Present QR.
+Use **Refresh results** for new submissions; results do not subscribe to Realtime or poll automatically. A transient refresh failure retains the previous snapshot with a clear stale-data message and last-loaded time. Authorization failures and missing/deleted surveys clear the snapshot. Malformed aggregate payloads are rejected rather than displayed as zero. Closed/Archived history, date filtering and CSV are implemented. Active results link back to Present QR.
 
 Manual checks: open a survey with known stored submissions, compare totals and per-choice percentages to Supabase, submit a response from a different browser/profile, then refresh results. Verify both question types, zero-choice counts, a survey with no responses and long answer text. Close/archive the test survey and ensure results remain available without a Present QR link. Try a signed-out results URL and confirm login redirect. Do not alter real classroom data just to create a test case; use a disposable survey and the normal lifecycle confirmations.
 
@@ -109,7 +109,23 @@ In the dashboard, combine title search and Closed/Archived status with **Created
 
 An inverted range shows an inline error and hides the filtered list until corrected, rather than claiming no surveys exist. Date changes reset pagination. **Clear filters** resets title, status, dates and page together. Filtering uses the already loaded survey list and does not change any survey, question or response record. Open **View results** on a matching historical card to inspect preserved data. Filters currently reset when the dashboard is remounted; no saved filter preferences are implied.
 
-Manual check: select Closed or Archived, set dates around the creation date printed on a card, combine with title search, and verify View results still opens the correct survey. Test a same-day range, either bound alone, an inverted range and Clear filters. Real-account/date-picker/mobile checks remain pending. No database migration or external configuration is needed; CSV export is the next phase.
+User reports the suggested history/date filter checks are all good; independent mobile/native-picker and evidence checks remain pending. No database migration or external configuration is needed for date filtering.
+
+## Combined batch: CSV and duplication verification (Phases 11–12)
+
+Before hosted CSV testing, run **only** `supabase/migrations/202611030003_csv_export.sql` once in Supabase SQL Editor. It adds `get_survey_export`, an allowlisted-instructor read RPC. It does not change/delete survey records or require new environment variables. Do not rerun the original schema/RPC migrations. The updated rollback-only hosted smoke test requires all three migrations and now checks export permissions/counts. See `supabase/README.md` for setup and application records.
+
+Choose **Export CSV** in an instructor results page with at least one stored response. It fetches a fresh, consistent database snapshot independently of the chart's previous refresh. New submissions committed after that snapshot are omitted until a later export. One download row corresponds to one response. Columns are survey ID/title/description/status/created timestamp/public slug, response ID/submission timestamp, then `Q1. question text`, `Q2. question text`, etc. Prefixes distinguish repeated question wording. Answer cells contain selected choice text; missing historical answers are blank. Timestamps retain their database ISO offset. Browser tokens, passwords and Auth data are excluded.
+
+Metadata repeats per response so the file stays a rectangular CSV with one header row. No-response export is disabled rather than generating a fake response/metadata row; refresh results after the first submission. Active, Closed and Archived exports use the same authorized function. Concurrent export is read-only and uses the PostgreSQL statement snapshot rather than paginating changing response rows. The intended classroom workload is supported structurally; no large-export performance or concurrent export benchmark is claimed.
+
+Every field is quoted, embedded quotes are doubled, records use CRLF, and a UTF-8 BOM supports spreadsheet Unicode import. Formula-leading values (including whitespace/control prefixes) get a leading apostrophe to mitigate spreadsheet formula execution. This intentionally alters those exported text cells; ordinary commas, quotes, line breaks and Unicode round-trip unchanged. Null characters are removed. The browser uses a temporary Blob URL and a filename based on survey UUID. A download-start notice is not proof that a browser saved the file.
+
+Automated tests parse the generated file with an independent CSV parser and verify metadata, row counts, question ordering, quoting/newlines/Unicode, blank answers, formula prefixes, malformed data and authorization failures. Database tests confirm anonymous/non-instructor export denial and browser-token exclusion. These do not replace opening the downloaded file in Excel/LibreOffice; actual browser download and spreadsheet checks remain pending after hosted migration application.
+
+Duplication was already implemented earlier. This batch additionally verifies copy title/description, both question types, full choice ordering/text, fresh question/choice IDs, Draft status, empty public slug and zero copied responses in PostgreSQL. The dashboard redirect to the new editor is component-tested. Final manual check: duplicate a survey containing both question types and responses; compare its ordered content, confirm zero responses, edit the copy and verify original content/history remain unchanged.
+
+The user-approved remaining plan is three reviewable batches: **11–12 CSV/duplication**, **13–14 UI polish/full testing**, then **15 deployment/submission**. Finish manual review of this batch before moving to the next. Phase 16 enhancements remain excluded.
 
 ## Architecture and roadmap
 
@@ -125,8 +141,8 @@ React renders routed pages; Tailwind supplies styles; the Supabase clients conne
 8. Browser-token duplicate protection included with Phase 7; basic refresh/count behavior user-reported, broader retry/multi-browser verification pending.
 9. Results dashboard (implemented; actual-account results verification pending).
 10. Historical results and title/status/created-date filters (implemented; manual date-filter verification pending).
-11. CSV export.
-12. Duplication integration verification (backend/dashboard already implemented).
+11. CSV export (implemented locally; hosted export migration, browser download and spreadsheet verification pending).
+12. Duplication integration verification (database/component checks expanded; final manual comparison pending).
 13. UI polish and accessibility.
 14. End-to-end, security and performance verification.
 15. Cloudflare Pages deployment and submission artifacts (GitHub source already configured).

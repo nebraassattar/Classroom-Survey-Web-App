@@ -1,11 +1,17 @@
 import { cloneElement, type ReactElement } from 'react'
-import { render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { ResultsPage } from '../src/pages/ResultsPage'
 import { resultsApi, type SurveyResults } from '../src/lib/results'
 import { surveyApi, type Survey } from '../src/lib/surveys'
+import { csvApi, downloadSurveyCsv } from '../src/lib/csvExport'
+
+vi.mock('../src/lib/csvExport', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/lib/csvExport')>()
+  return { ...actual, csvApi: { get: vi.fn() }, downloadSurveyCsv: vi.fn() }
+})
 
 vi.mock('../src/lib/results', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../src/lib/results')>()
@@ -81,6 +87,16 @@ function mount() {
   )
 }
 beforeEach(() => {
+  vi.mocked(csvApi.get)
+    .mockReset()
+    .mockResolvedValue({
+      survey: { ...survey },
+      questions: [],
+      responses: [
+        { id: 'r1', submitted_at: '2026-11-03T12:00:00Z', answers: [] },
+      ],
+    })
+  vi.mocked(downloadSurveyCsv).mockReset()
   vi.stubGlobal(
     'ResizeObserver',
     class {
@@ -98,6 +114,51 @@ beforeEach(() => {
 })
 afterEach(() => vi.unstubAllGlobals())
 describe('instructor results', () => {
+  it('prevents duplicate export requests while a snapshot is loading', async () => {
+    let resolve!: (value: Awaited<ReturnType<typeof csvApi.get>>) => void
+    const data = await csvApi.get('survey-id')
+    vi.mocked(csvApi.get)
+      .mockClear()
+      .mockImplementation(
+        () =>
+          new Promise((done) => {
+            resolve = done
+          }),
+      )
+    mount()
+    await screen.findByRole('table')
+    const button = screen.getByRole('button', { name: 'Export CSV' })
+    fireEvent.click(button)
+    fireEvent.click(button)
+    expect(csvApi.get).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: 'Exporting…' })).toBeDisabled()
+    await act(async () => resolve(data))
+    expect(downloadSurveyCsv).toHaveBeenCalledTimes(1)
+  })
+  it('downloads a fresh instructor snapshot and reports its response count', async () => {
+    mount()
+    await screen.findByRole('table')
+    await userEvent.click(screen.getByRole('button', { name: 'Export CSV' }))
+    expect(await screen.findByRole('status')).toHaveTextContent('1 response')
+    expect(csvApi.get).toHaveBeenCalledWith('survey-id')
+    expect(downloadSurveyCsv).toHaveBeenCalledWith(
+      'survey-id',
+      expect.stringContaining('response_id'),
+    )
+  })
+  it('reports export failures without starting a misleading download', async () => {
+    vi.mocked(csvApi.get).mockRejectedValue({
+      code: 'PGRST202',
+      message: 'missing function',
+    })
+    mount()
+    await screen.findByRole('table')
+    await userEvent.click(screen.getByRole('button', { name: 'Export CSV' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'export database migration',
+    )
+    expect(downloadSurveyCsv).not.toHaveBeenCalled()
+  })
   it('clears a prior snapshot if a later refresh says the survey no longer exists', async () => {
     mount()
     await screen.findByRole('table')
@@ -143,6 +204,7 @@ describe('instructor results', () => {
     })
     const view = mount()
     await screen.findByRole('heading', { name: 'No responses yet.' })
+    expect(screen.getByRole('button', { name: 'Export CSV' })).toBeDisabled()
     expect(screen.getByText('0 answered · 0 unanswered')).toBeInTheDocument()
     expect(within(screen.getByRole('table')).getAllByText('0.0%')).toHaveLength(
       3,

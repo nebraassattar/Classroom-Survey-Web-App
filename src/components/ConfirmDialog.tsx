@@ -27,6 +27,7 @@ export function ConfirmDialog({
     return () => {
       element?.close()
       if (previous?.isConnected) previous.focus()
+      else document.getElementById('main-content')?.focus()
     }
   }, [])
   return (

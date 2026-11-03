@@ -70,3 +70,18 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - Interpret unspecified date filtering as survey creation dates, explicitly labelled Created from/through. This matches existing card dates and avoids implying filters on student submission timestamps. Compare inclusive local calendar dates, not UTC date strings or fixed 24-hour intervals.
 - Either date may be blank. Combine all selected criteria; reset pagination after changing a bound. Show an error for a reversed range and suppress misleading empty counts. Clear filters resets all criteria and pagination without re-fetching or modifying data.
 - Apply filters to the existing complete loaded list, including Closed/Archived surveys. No schema or policy change. Filters reset when the dashboard remounts; saved preferences are outside this phase.
+
+## Combined Phases 11–12
+
+- User approved three remaining review batches: 11–12 CSV/duplication, 13–14 polish/full testing, then 15 deployment/submission. Keep review boundaries and exclude post-MVP Phase 16.
+- Add a versioned STABLE instructor-only export RPC. PostgreSQL uses one statement snapshot for all reads, avoiding inconsistent client pagination during active collection. Return whitelisted metadata/questions/response answers, never browser tokens. Existing project must apply only the new migration; no table data changes are needed.
+- CSV has one header and one row per response; survey metadata repeats per row. Question headers include ordered Q numbers to distinguish identical wording. Missing historical answers are blank. Disable no-response download rather than creating an artificial response row.
+- Quote every field, double embedded quotes, use CRLF plus UTF-8 BOM, and prefix formula-leading/control-prefixed cells as text. This deliberate text-prefix change is documented. Actual spreadsheet behavior requires manual verification; parser tests are not a claim of Excel testing.
+- CSV always fetches a fresh server snapshot; counts can differ from previously refreshed charts. Protect repeated export events, fail on invalid relationships, report download start and dispose of temporary Blob URLs.
+- Duplication uses the existing RPC/UI. Expand verification for metadata, types, text/order, fresh identities, Draft/slug state and no response copying. Final manual copy/original comparison remains open.
+
+## Combined Phases 13–14
+
+- Provide route titles, a skip link and heading focus after navigation. Wait for lazy content; avoid stealing focus after the user begins interacting. Focus terminal student outcomes so completion is announced through normal heading navigation.
+- Catch unexpected render/lazy-load failures with a recovery screen, preserving the same-browser guidance for uncertain submissions. Keep detailed internals out of the screen.
+- Use axe in component fixtures for semantic regressions. Disable color contrast only because JSDOM lacks layout; retain real browser/device, assistive-technology, load and concurrent-session checks as explicit gates.

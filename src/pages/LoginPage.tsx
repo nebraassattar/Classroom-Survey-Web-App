@@ -21,7 +21,11 @@ export function LoginPage() {
     setBusy(false)
   }
   return (
-    <main className="mx-auto max-w-md px-6 py-16">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto max-w-md px-6 py-16"
+    >
       <Link
         className="text-sm font-semibold tracking-widest text-teal-800"
         to="/"

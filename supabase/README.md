@@ -14,12 +14,15 @@ In SQL Editor of the new empty project, run the complete contents of each file s
 
 - `migrations/202611020001_schema.sql`
 - `migrations/202611020002_rpcs.sql`
+- `migrations/202611030003_csv_export.sql`
+
+**Existing project through Phase 10:** run only the new `202611030003_csv_export.sql` file in SQL Editor. Do not rerun the first two migrations. It adds an instructor-only read function without changing or deleting stored survey data. Export CSV shows a setup message until this is applied. Then refresh the app and export a survey with stored responses. Record the application date below; no credentials need to be shared.
 
 Each is transactional: an error rolls that file back. Stop on errors and record sanitized text. Do not rerun a successful file; these are ordered migrations, not idempotent scripts. Future changes belong in new files. Inspect any existing database before applying; never reset populated hosted data to retry. Record applied versions/dates below.
 
 This SQL Editor workflow does not populate Supabase CLI migration history. If switching to CLI `db push` later, reconcile that history first; do not reapply the initial migrations.
 
-After both migrations, provision membership in SQL Editor (replace only the UUID with your manually created Auth user's UUID):
+After the migrations, provision membership in SQL Editor (replace only the UUID with your manually created Auth user's UUID; existing instructors do not need to be recreated):
 
 ```sql
 insert into private.instructors(user_id)
@@ -51,7 +54,7 @@ select policyname, tablename, roles, cmd from pg_policies
 where schemaname = 'public';
 ```
 
-Run `tests/hosted-smoke.sql` in SQL Editor after provisioning an instructor. It uses the first allowlisted user as a test principal and rolls back all temporary fixtures. It may temporarily close the current active survey inside its transaction; run against the initial/test project when no classroom collection is in progress. Expect a success notice and rollback. SQL Editor normally runs as a privileged role: ordinary queries there alone are not RLS evidence. Never run the embedded test Auth bootstrap on Supabase.
+Run `tests/hosted-smoke.sql` in SQL Editor after all three migrations and instructor provisioning. It uses the first allowlisted user as a test principal and rolls back all temporary fixtures, including export permission/count checks. It may temporarily close the current active survey inside its transaction; run against the initial/test project when no classroom collection is in progress. Expect a success notice and rollback. SQL Editor normally runs as a privileged role: ordinary queries there alone are not RLS evidence. Never run the embedded test Auth bootstrap on Supabase.
 
 This smoke test checks database roles, not real JWT issuance or HTTP behavior. Test actual signed-in/signed-out clients after Phase 3 and real concurrent activation/submit/close sessions before claiming concurrency verified. Capture sanitized Table Editor screenshots with real application records in later phases.
 
@@ -92,7 +95,8 @@ Instructor mutations acquire a singleton row lock first to serialize activation.
 ## Hosted application record
 
 - Project created: user-reported in supplied setup history on 2026-11-02.
-- Both migration versions applied: inferred from user-reported successful instructor provisioning and full smoke-script execution; no direct inspection or exact application timestamps available.
+- Initial two migration versions applied: inferred from user-reported successful provisioning and smoke execution; exact dates remain unrecorded.
+- Export migration `202611030003_csv_export.sql`: pending hosted application and verification.
 - Instructor provisioned: user-reported successful allowlist insert. Read-only Auth settings initially reported signup enabled; after the user turned it off and saved, a repeat check independently confirmed `disable_signup: true` on 2026-11-02.
 - Browser-safe local variables: user saved values; all three expected fields are filled and the file is Git-ignored. Values were not printed. Read-only hosted connectivity now verified.
 - Hosted smoke: user reports executing the entire script with no error, displaying a blank `set_config` result. This is consistent with successful execution; PASS notice was not captured and the agent did not independently observe the hosted run.
