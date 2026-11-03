@@ -1,6 +1,6 @@
 # Classroom Survey Web App
 
-Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, a full draft editor, classroom QR presentation and anonymous student forms with atomic submissions. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. Results/CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
+Individual CSE 4095 project. The app includes secure instructor login, a Supabase-backed dashboard, draft editing, classroom QR presentation, anonymous atomic submissions and instructor results with counts, percentages and Recharts charts. Versioned migrations enforce RLS, authorization, lifecycle rules and duplicate protection. Historical date filters, CSV and deployment remain pending. No mock data is used in the application; automated tests use isolated fixtures.
 
 ## Local setup
 
@@ -59,7 +59,7 @@ Open an existing Draft with **Edit**, or create a new survey. Add questions, sel
 
 Unsaved edits trigger confirmation on the Back to dashboard link, and a browser warning on reload/tab close when supported. Other browser-history transitions are not comprehensively blocked; save before navigating elsewhere. No autosave is implied.
 
-User reports the Phase 5 editor and save/reopen/refresh workflow work as expected after the suggested checks. Mobile/native-dialog verification remains pending. Test Save and activate only on a disposable survey when no classroom collection is active, because it closes the previous Active survey. Results pages remain pending.
+User reports the Phase 5 editor and save/reopen/refresh workflow work as expected after the suggested checks. Mobile/native-dialog verification remains pending. Test Save and activate only on a disposable survey when no classroom collection is active, because it closes the previous Active survey. Results pages are now available through View results.
 
 `npm test` covers editor/service/Auth behavior with fixtures; `npm run test:db` executes real PostgreSQL draft updates, ordering and rollback checks. Protected page bundles load on demand with a loading fallback; build sizes are measured, but the under-two-second page-load target remains unverified.
 
@@ -73,7 +73,7 @@ The QR is a 1024×1024 PNG with a four-module quiet zone and medium error correc
 
 Survey status and response count refresh together, with the next poll scheduled 10 seconds after a successful Active-survey check; requests do not overlap. Refresh is also available manually. Closing elsewhere removes QR/download once detected. A status-fetch failure hides stale sharing information and asks for manual refresh; a count-only failure shows Unavailable, never a false zero. Closing here preserves history and prevents an older Active snapshot from restoring the QR. Counts use instructor-only queries, not a public response-count endpoint.
 
-User reports checking the presentation and that it works as expected. Independent browser download, phone/projector and cross-tab checks remain pending. Use a second instructor tab to activate a different survey and confirm the previous presentation detects closure. `/s/:slug` now renders the Phase 7 student form. Results navigation remains pending.
+User reports checking the presentation and that it works as expected. Independent browser download, phone/projector and cross-tab checks remain pending. Use a second instructor tab to activate a different survey and confirm the previous presentation detects closure. `/s/:slug` now renders the Phase 7 student form. View results now links from the presentation to the protected results page.
 
 ## Phase 7 student form and required duplicate-protection foundation
 
@@ -87,11 +87,25 @@ If a network response is lost after commit, retrying with the same token may ret
 
 Manual workflow: activate a disposable complete survey, open Present QR, copy the student URL into an incognito window on the same computer, answer both question types, submit, and refresh to check Already submitted. In the instructor presentation, refresh/wait for the response count. In Supabase Table Editor inspect the new `responses` row and associated `answers`, then refresh again to establish persistence. Do not expose anonymous tokens in screenshots. Open a student form, close the survey in the instructor tab, and confirm a late submission rejects. An unknown slug should show Survey not found.
 
-Phone checks require a reachable LAN/public origin; localhost refers to the phone itself. Real anonymous browser submission, stored-record inspection, duplicate/closure behavior, mobile/two-browser and full QR workflow verification remain pending. A read-only lookup found no active hosted survey during implementation, so the agent did not create or submit hosted data. No new migrations or external configuration are required. Results/CSV are later phases.
+User subsequently reported the suggested student submission, refresh/duplicate, response-count and stored-record workflow works as expected. This is user-reported verification, not independently captured database evidence. Phone checks require a reachable LAN/public origin; localhost refers to the phone itself. Detailed mobile/two-browser, uncertain-network replay and concurrent closure checks remain pending. The agent did not create or submit hosted data. No new migrations or external configuration are required. CSV is a later phase.
+
+## Phase 9 instructor results
+
+Select **View results** on any dashboard survey card or from the presentation page. The protected `/surveys/:id/results` route calls the existing instructor-only `get_survey_results` RPC and fetches survey metadata. It never reads raw anonymous tokens or student response rows. Anonymous/non-instructor results remain denied in the database.
+
+Each question shows answered/unanswered counts, a horizontal Recharts count chart and a semantic table with full choice text, counts and one-decimal percentages. Zero-count choices remain visible; zero-response surveys show an empty state with 0.0% values rather than NaN. Percentages use total survey responses as the denominator, including any unanswered questions; rounded percentages may total 99.9% or 100.1%. True/False uses the same aggregation and display.
+
+Charts number choices to avoid truncating long answer text; the matching table includes the full text and exact values. Recharts keyboard accessibility is enabled, and numerical tables avoid reliance on color or tooltips. Chart rendering is tested with real Recharts SVG and fixed test-container dimensions; actual browser resizing, phone layout and screen-reader interaction still need manual checks.
+
+Use **Refresh results** for new submissions; results do not subscribe to Realtime or poll automatically. A transient refresh failure retains the previous snapshot with a clear stale-data message and last-loaded time. Authorization failures and missing/deleted surveys clear the snapshot. Malformed aggregate payloads are rejected rather than displayed as zero. Closed/Archived history is supported now; date filtering remains Phase 10 and CSV remains Phase 11. Active results link back to Present QR.
+
+Manual checks: open a survey with known stored submissions, compare totals and per-choice percentages to Supabase, submit a response from a different browser/profile, then refresh results. Verify both question types, zero-choice counts, a survey with no responses and long answer text. Close/archive the test survey and ensure results remain available without a Present QR link. Try a signed-out results URL and confirm login redirect. Do not alter real classroom data just to create a test case; use a disposable survey and the normal lifecycle confirmations.
+
+No new migration is needed. Database tests cover mixed counts, 66.7%/33.3% rounding, zero-count choices, authorization and preserved history. Actual-account results, responsive charts and comparison screenshots remain pending. Tests encountered sandbox worker-start/timeouts; running the fixture suite outside the sandbox passed. Vitest uses at most two workers to bound resource usage. Run checks in your normal terminal if sandbox workers cannot start.
 
 ## Architecture and roadmap
 
-React renders routed pages; Tailwind supplies styles; the Supabase client connects to Auth and PostgreSQL. PostgreSQL owns authorization, constraints, activation transactions, and atomic submissions. Recharts and qrcode are declared for later phases.
+React renders routed pages; Tailwind supplies styles; the Supabase clients connect to Auth and PostgreSQL. PostgreSQL owns authorization, constraints, activation, atomic submissions and result aggregation. Recharts renders results, and qrcode generates presentation PNGs. Larger pages load on demand.
 
 1. Project setup (complete).
 2. Versioned migrations, RLS, instructor allowlist, submission/activation RPCs and database security tests (implemented locally; hosted setup pending).
@@ -99,10 +113,10 @@ React renders routed pages; Tailwind supplies styles; the Supabase client connec
 4. Dashboard, duplication and lifecycle controls (implemented; create/refresh user-confirmed, other actual-account checks pending).
 5. Full question editor (implemented; actual-account workflow user-confirmed).
 6. Classroom presentation with public URLs and downloadable QR PNG (implemented; user reports expected behavior; detailed phone/projector/cross-tab checks pending).
-7. Anonymous student forms (implemented; real anonymous submission/persistence verification pending).
-8. Browser-token duplicate protection foundation included with Phase 7 because the submission RPC requires it; actual-browser verification pending.
-9. Results dashboard.
-10. Historical results browsing.
+7. Anonymous student forms (implemented; suggested workflow user-reported successful).
+8. Browser-token duplicate protection included with Phase 7; basic refresh/count behavior user-reported, broader retry/multi-browser verification pending.
+9. Results dashboard (implemented; actual-account results verification pending).
+10. Closed/Archived history supported by results page; date filtering pending.
 11. CSV export.
 12. Duplication integration verification (backend/dashboard already implemented).
 13. UI polish and accessibility.

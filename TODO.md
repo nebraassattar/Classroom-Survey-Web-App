@@ -1,8 +1,8 @@
 # Classroom Survey Web App — TODO
 
-## Audit status — 2026-11-02
+## Audit status — 2026-11-03
 
-The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–6 are committed/pushed; hosted provisioning/smoke are user-reported and read-only hosted restrictions are independently checked. Real login/refresh/logout, draft persistence, editor and presentation behavior are user-confirmed. Phase 7 student forms and the required Phase 8 token foundation are implemented locally. Results and deployment, actual anonymous workflow evidence, broader hosted checks and concurrency/performance verification remain pending.
+The starting workspace contained only five specification files, without application code or Git history. Inherited checks were reset. Phases 1–7 and the Phase 8 duplicate foundation are committed/pushed. Real login, draft/editor/presentation and suggested student workflows are user-reported successful. Phase 9 results are implemented locally, including Closed/Archived viewing. Date filters, CSV, deployment, evidence capture, broader hosted/concurrency and performance checks remain pending.
 
 ## Purpose
 
@@ -199,25 +199,30 @@ Required foundation implemented alongside Phase 7; actual-browser/hosted retry v
 
 # Phase 9 — Results Dashboard
 
-- [ ] Create a results page for each survey.
-- [ ] Show total response count.
-- [ ] Aggregate answers by question.
-- [ ] Show counts for each choice.
-- [ ] Show percentages for each choice.
-- [ ] Add bar charts using Recharts.
-- [ ] Clearly label unanswered questions.
-- [ ] Add Refresh Results button.
-- [ ] Add link back to the main dashboard.
+Implemented with component/service/chart and database tests; real instructor results and responsive/chart accessibility verification remain pending. Existing aggregation RPC is used; no new migration or direct response reads.
+
+- [x] Create a protected results page for each survey.
+- [x] Show total response count.
+- [x] Aggregate answers by question through the instructor-only RPC.
+- [x] Show counts for each choice, including zero-count choices.
+- [x] Show percentages for each choice with explicit denominator and rounding note.
+- [x] Add horizontal bar charts using Recharts, plus semantic numeric tables.
+- [x] Clearly label answered and unanswered counts.
+- [x] Add Refresh Results, loading/empty/error states and stale-snapshot handling.
+- [x] Add links from dashboard/presentation and back to dashboard/Active presentation.
+- [x] Test mixed database counts, rounded percentages, zero choices and history.
+- [ ] Verify actual-account results against stored records and refreshed submissions.
+- [ ] Verify mobile/chart resizing, keyboard/screen-reader interaction and capture evidence.
 
 ---
 
 # Phase 10 — Historical Results
 
-- [ ] Allow viewing results for Closed surveys.
-- [ ] Allow viewing results for Archived surveys.
+- [x] Allow viewing results for Closed surveys (implementation/component/database tested; actual-account check pending).
+- [x] Allow viewing results for Archived surveys (implementation/component/database tested; actual-account check pending).
 - [ ] Add filtering by date.
-- [ ] Add filtering by survey title.
-- [ ] Preserve all historical response data.
+- [x] Add filtering by survey title (existing dashboard search covers history).
+- [x] Preserve historical response data through close/archive (database-tested).
 
 ---
 

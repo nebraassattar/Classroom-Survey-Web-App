@@ -374,6 +374,48 @@ try {
     ],
   )
   checks++
+  // Verify mixed totals and one-decimal rounding, then roll back extra fixtures.
+  await db.exec('begin')
+  try {
+    await role('anon')
+    await submit(
+      first,
+      randomUUID(),
+      payload.map((answer, index) =>
+        index === 0
+          ? { ...answer, choice_id: published.questions[0].choices[1].id }
+          : answer,
+      ),
+    )
+    await submit(first, randomUUID(), payload)
+    await role('authenticated', instructor)
+    const mixed = await results(first)
+    assert.equal(mixed.response_count, 3)
+    checks++
+    assert.deepEqual(
+      mixed.questions[0].choices.map((c) => [c.count, c.percentage]),
+      [
+        [2, 66.7],
+        [1, 33.3],
+      ],
+    )
+    checks++
+    assert.deepEqual(
+      mixed.questions[1].choices.map((c) => [c.count, c.percentage]),
+      [
+        [3, 100],
+        [0, 0],
+      ],
+    )
+    checks++
+    assert.equal(mixed.questions[0].response_count, 3)
+    checks++
+  } finally {
+    await db.exec('rollback')
+    await role('authenticated', instructor)
+  }
+  assert.equal((await results(first)).response_count, 1)
+  checks++
   const copy = await value('select public.duplicate_survey($1) as value', [
     first,
   ])

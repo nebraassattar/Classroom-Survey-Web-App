@@ -226,6 +226,11 @@ function Presentation({ id }: { id: string }) {
             </>
           )}
           <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {survey && (
+              <Link className="button-secondary" to={`/surveys/${id}/results`}>
+                View results
+              </Link>
+            )}
             <button
               className="button-secondary"
               disabled={refreshing || closing}

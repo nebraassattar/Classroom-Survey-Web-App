@@ -28,6 +28,11 @@ const StudentSurveyPage = lazy(() =>
     default: module.StudentSurveyPage,
   })),
 )
+const ResultsPage = lazy(() =>
+  import('./pages/ResultsPage').then((module) => ({
+    default: module.ResultsPage,
+  })),
+)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -54,6 +59,7 @@ createRoot(document.getElementById('root')!).render(
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/surveys/new" element={<SurveyDraftPage />} />
               <Route path="/surveys/:id/edit" element={<SurveyDraftPage />} />
+              <Route path="/surveys/:id/results" element={<ResultsPage />} />
               <Route
                 path="/surveys/:id/present"
                 element={<PresentSurveyPage />}

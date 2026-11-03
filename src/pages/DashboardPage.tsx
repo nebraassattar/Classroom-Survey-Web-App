@@ -268,6 +268,12 @@ export function DashboardPage() {
                   </p>
                 )}
                 <div className="mt-5 flex flex-wrap gap-2">
+                  <Link
+                    className="button-secondary"
+                    to={`/surveys/${survey.id}/results`}
+                  >
+                    View results
+                  </Link>
                   {survey.status === 'draft' && (
                     <Link
                       className="button-secondary"
@@ -358,9 +364,6 @@ export function DashboardPage() {
           )}
         </section>
       )}
-      <p className="mt-8 text-sm text-slate-600">
-        Results pages are not available yet.
-      </p>
       {confirmation && (
         <ConfirmDialog
           title={`${{ activate: 'Activate', close: 'Close', archive: 'Archive', delete: 'Delete' }[confirmation.action]} “${confirmation.survey.title}”?`}

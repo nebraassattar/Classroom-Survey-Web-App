@@ -56,3 +56,11 @@ Recorded 2026-11-02. Phase 2 migrations implement the database decisions below a
 - Store per-survey success markers only after server success or a server duplicate result. Markers restore Already submitted after refresh but are not a security boundary; database uniqueness protects same-token retries. If an optional marker write fails, keep the valid success confirmation. Clearing storage or changing browser/device/origin bypasses browser-based identity and is documented.
 - A lost response after commit can yield Duplicate on retry; do not claim failure means nothing was stored. Keep selections on retryable errors and use friendly generic errors without database details. Refreshing an unfinished form can lose in-memory selections; no student autosave is included.
 - Phase 6's student-form absence labels are removed. Results/CSV remain pending. No schema, Auth setting or hosted data changes are required by this phase.
+
+## Phase 9 results
+
+- Phase 8 code was necessary in Phase 7 and already implemented/tested; after the user's student-workflow confirmation, proceed to the next unfinished feature, results. Broader duplicate/replay checks remain open rather than silently claimed complete.
+- Read only the existing instructor aggregate RPC plus survey metadata. Validate aggregate counts/shape, then sort by stored positions. No new SQL, permission grants, raw student-row reads or browser calculations replace the database aggregates.
+- Percentages use all survey responses; show one decimal place, zero choices and explicit answered/unanswered totals. Required current submissions are complete, but the display also handles incomplete historical/admin-imported data without concealing it.
+- Use horizontal count charts with numbered choices and a semantic full-text numeric table. Enable Recharts accessibility; defer actual browser/screen-reader evidence to verification. Results are loaded on demand, not through Realtime.
+- Preserve a labelled prior snapshot on transient refresh failures; clear it on access revocation or missing/deleted survey. Closed/Archived viewing ships with this route; date filtering and CSV remain separately planned work.
